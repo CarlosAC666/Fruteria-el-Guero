@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verduras - Frutería el Güero</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            background-color: #2e7d32;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .modal-description {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .quantity-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .quantity-display {
+            margin: 0 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .add-to-cart-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .add-to-cart-btn:hover {
+            background-color: #1b5e20;
+        }
+        
+        /* Hacer las tarjetas clickeables */
+        .product-card {
+            cursor: pointer;
+        }
+
+        /* Botón para ver carrito */
+        .view-cart-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2e7d32;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+
+        .cart-count {
+            background: #ff5722;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Estilos para el mensaje de confirmación */
+        .confirmation-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .confirmation-message.show {
+            transform: translateY(0);
+        }
+
+        /* Estilos para el botón de ver producto */
+        .view-product-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: null;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .view-product-btn:hover {
+            background-color: #388E3C;
+        }
+
+        /* Estilos para el botón de ayuda en el header */
+        .help-btn-header {
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+
+        /* Estilos para el modal de ayuda */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .help-modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .help-modal-header {
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .help-modal-title {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .help-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .help-modal-body {
+            padding: 20px;
+        }
+
+        .help-step {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background-color: #0CC078;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2e7d32;
+        }
+        
+        /* Estilos para la navegación activa - SOLO PARA EL MENÚ PRINCIPAL */
+        .active-nav-item {
+            background-color: #4CAF50;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .active-nav-item a {
+            color: white !important;
+        }
+        
+        /* Estilos para el dropdown activo - SOLO LA OPCIÓN ACTIVA */
+        .dropdown-content a.active-dropdown-item {
+            background-color: #4CAF50 !important;
+            color: white !important;
+        }
+        
+        /* Mantener el estilo original para las demás opciones del dropdown */
+        .dropdown-content a {
+            background-color: white !important;
+            color: #333 !important;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f1f1f1 !important;
+            color: #333 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mensaje de confirmación -->
+    <div id="confirmationMessage" class="confirmation-message"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <a href="Beta1.html#inicio">
+        <img src="Fruteria logo.png" width="130" height="130">
+    </a> Frutería el Güero
+            </div>
+            <nav>
+                <ul>
+                    <li id="nav-inicio"><a href="Beta1.html#inicio"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li class="dropdown" id="nav-productos">
+                        <a href="#productos"><i class="fas fa-shopping-basket"></i> Productos</a>
+                        <div class="dropdown-content">
+                            <a href="frutas.html" id="dropdown-frutas"><i class="fas fa-apple-alt"></i> Frutas</a>
+                            <a href="verduras.html" id="dropdown-verduras"><i class="fas fa-leaf"></i> Verduras</a>
+                            <a href="carne.html" id="dropdown-carne"><i class="fas fa-drumstick-bite"></i> Carne</a>
+                            <a href="tornachiles.html" id="dropdown-tornachiles"><i class="fas fa-pepper-hot"></i> Tornachiles</a>
+                        </div>
+                    </li>
+                    <li id="nav-contacto"><a href="Contacto.html"><i class="fas fa-envelope"></i> Contacto</a></li>
+                    <li id="nav-pedidos"><a href="carrito.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+                    <li><a class="help-btn-header" onclick="openHelpModal()"><i class="fas fa-question-circle"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Productos Verduras -->
+    <section class="products-section">
+        <div class="container">
+            <h2 class="section-title">Verduras Disponibles</h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Tomates.png" alt="Tomates" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Tomate Rojo</h3>
+                        <p class="product-price">$27.00 pesos /kg</p>
+                        <p class="product-description">Tomates maduros y sabrosos.</p>
+                        <button class="view-product-btn" onclick="openModal('Tomate Rojo', 27.00, 'kg', 'imagenes/Tomates.png')">Ver Producto</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Zanahoria.png" alt="Zanahorias" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Zanahorias</h3>
+                        <p class="product-price">$17.00 pesos /kg</p>
+                        <p class="product-description">Zanahorias frescas y crujientes.</p>
+                        <button class="view-product-btn" onclick="openModal('Zanahorias', 17.00, 'kg', 'imagenes/Zanahoria.png')">Ver Producto</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Lechuga.png" alt="Lechuga" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Lechuga</h3>
+                        <p class="product-price">$20.00 pesos por pieza</p>
+                        <p class="product-description">Lechuga fresca.</p>
+                        <button class="view-product-btn" onclick="openModal('Lechuga', 20.00, 'pieza', 'imagenes/Lechuga.png')">Ver Producto</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Cebolla.png" alt="Cebollas" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Cebollas</h3>
+                        <p class="product-price">$24.00 pesos /kg</p>
+                        <p class="product-description">Cebolla blanca.</p>
+                        <button class="view-product-btn" onclick="openModal('Cebollas', 24.00, 'kg', 'imagenes/Cebolla.png')">Ver Producto</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Repollo.png" alt="Repollo" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Repollo</h3>
+                        <p class="product-price">$13.00 pesos /kg</p>
+                        <p class="product-description">Repollo fresco.</p>
+                        <button class="view-product-btn" onclick="openModal('Repollo', 13.00, 'kg', 'imagenes/Repollo.png')">Ver Producto</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Tomatillos.png" alt="Tomatillos" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Tomatillos</h3>
+                        <p class="product-price">$26.00 pesos /kg</p>
+                        <p class="product-description">Tomatillos Frescos.</p>
+                        <button class="view-product-btn" onclick="openModal('Tomatillos', 26.00, 'kg', 'imagenes/Tomatillos.png')">Ver Producto</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\papa.png" alt="Papas" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Papas</h3>
+                        <p class="product-price">$20.00 pesos /kg</p>
+                        <p class="product-description">Papa Lavada.</p>
+                        <button class="view-product-btn" onclick="openModal('Papas', 20.00, 'kg', 'imagenes/papa.png')">Ver Producto</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Calabaza.png" alt="Calabaza Italiana" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Calabaza Italiana</h3>
+                        <p class="product-price">$27.00 pesos /kg</p>
+                        <p class="product-description">Calabaza fresca.</p>
+                        <button class="view-product-btn" onclick="openModal('Calabaza Italiana', 27.00, 'kg', 'imagenes/Calabaza.png')">Ver Producto</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Chile Ancho.png" alt="Chile Ancho" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Chile Ancho</h3>
+                        <p class="product-price">$25.00 pesos /kg</p>
+                        <p class="product-description">Chiles anchos para rellenos.</p>
+                        <button class="view-product-btn" onclick="openModal('Chile Ancho', 25.00, 'kg', 'imagenes/Chile Ancho.png')">Ver Producto</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Jalapeños.png" alt="Chile Jalapeño" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Chile Jalapeño</h3>
+                        <p class="product-price">$35.00 pesos /kg</p>
+                        <p class="product-description">Chile Jalapeño.</p>
+                        <button class="view-product-btn" onclick="openModal('Chile Jalapeño', 35.00, 'kg', 'imagenes/Jalapeños.png')">Ver Producto</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-category">Verduras</div>
+                    <img src="imagenes\Chile Serranos.png" alt="Chile Serrano" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">Chile Serrano</h3>
+                        <p class="product-price">$55.00 pesos /kg</p>
+                        <p class="product-description">Chile Serrano.</p>
+                        <button class="view-product-btn" onclick="openModal('Chile Serrano', 55.00, 'kg', 'imagenes/Chile Serranos.png')">Ver Producto</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Botón flotante para ver carrito -->
+    <a href="carrito.html" class="view-cart-btn">
+        <i class="fas fa-shopping-basket"></i>
+        <span class="cart-count" id="cartCount">0</span>
+    </a>
+
+    <!-- Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalProductName">Tomate Rojo</h2>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="modal-price" id="modalProductPrice">$27.00</p>
+                <p class="modal-description" id="modalProductDescription">Tomates maduros y sabrosos, ideales para ensaladas, salsas o guisos.</p>
+                
+                <div class="quantity-selector">
+                    <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                    <span class="quantity-display" id="quantityDisplay">1</span>
+                    <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+                </div>
+                
+                <button class="add-to-cart-btn" onclick="addToCart()">Añadir al Carrito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de ayuda -->
+    <div id="helpModal" class="help-modal">
+        <div class="help-modal-content">
+            <div class="help-modal-header">
+                <h2 class="help-modal-title">Cómo hacer un pedido</h2>
+                <span class="help-close-btn" onclick="closeHelpModal()">&times;</span>
+            </div>
+            <div class="help-modal-body">
+                <div class="help-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Explora nuestros productos</div>
+                        <p>Navega por nuestras categorías de frutas, verduras, carnes y tornachiles para ver todos los productos disponibles.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Selecciona un producto</div>
+                        <p>Haz clic en el botón "Ver Producto" de cualquier artículo que te interese para ver más detalles.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Selecciona la cantidad</div>
+                        <p>En la ventana emergente, usa los botones + y - para seleccionar la cantidad deseada. Para frutas, verduras y carnes puedes seleccionar medios kilos.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Añade al carrito</div>
+                        <p>Haz clic en "Añadir al Carrito" para agregar el producto con la cantidad seleccionada a tu pedido.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Revisa y finaliza tu pedido</div>
+                        <p>Haz clic en el botón de carrito en la esquina inferior derecha para ver todos los productos seleccionados y completar tu pedido.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-title">Confirma tu pedido</div>
+                        <p>En la página de pedidos, revisa los productos, cantidades y precios. Si todo está correcto, confirma tu pedido para que lo preparemos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <img src="imagenes\Fruteria.png" width="180" height="180">
+                </div>
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p><i class="fas fa-phone" style="color: #FCFC99;"></i> +52 1 675 871 0267</p>
+                    <p><i class="fas fa-map-marker-alt" style="color: #FCFC99;"></i> Cieneguilla, Rojas, La Ochoa, Pilares</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Horario</h3>
+                    <p>Martes a Viernes: 8:00 - 20:00</p>
+                    <p>Domingos: 10:00 - 14:00</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 Frutería el Güero. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentQuantity = 1;
+        let currentProduct = {
+            name: '',
+            price: 0,
+            description: '',
+            image: '',
+            category: 'Verduras'
+        };
+
+        // Función para actualizar el contador del carrito
+        function actualizarContadorCarrito() {
+            const carrito = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
+            const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+        
+        function openModal(name, price, description, image) {
+            currentProduct = {
+                name: name,
+                price: price,
+                description: description,
+                image: image,
+                category: 'Verduras'
+            };
+            
+            document.getElementById('modalProductName').textContent = name;
+            document.getElementById('modalProductPrice').textContent = `$${price.toFixed(2)}`;
+            document.getElementById('modalProductDescription').textContent = description;
+            document.getElementById('productModal').style.display = 'flex';
+            currentQuantity = 1;
+            document.getElementById('quantityDisplay').textContent = currentQuantity;
+            updatePriceDisplay();
+        }
+        
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+        
+        function increaseQuantity() {
+            currentQuantity += 0.5;
+            document.getElementById('quantityDisplay').textContent = currentQuantity;
+            updatePriceDisplay();
+        }
+        
+        function decreaseQuantity() {
+            if (currentQuantity > 0.5) {
+                currentQuantity -= 0.5;
+                document.getElementById('quantityDisplay').textContent = currentQuantity;
+                updatePriceDisplay();
+            }
+        }
+        
+        // Función para actualizar el precio mostrado según la cantidad
+        function updatePriceDisplay() {
+            const totalPrice = (currentProduct.price * currentQuantity).toFixed(2);
+            document.getElementById('modalProductPrice').textContent = `$${totalPrice}`;
+        }
+        
+        // Función para mostrar mensaje de confirmación
+        function showConfirmationMessage(message) {
+            const messageElement = document.getElementById('confirmationMessage');
+            messageElement.textContent = message;
+            messageElement.classList.add('show');
+            
+            // Ocultar el mensaje después de 3 segundos
+            setTimeout(() => {
+                messageElement.classList.remove('show');
+            }, 3000);
+        }
+        
+        function addToCart() {
+            // Obtener carrito actual de localStorage
+            const carritoActual = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
+            
+            // Buscar si el producto ya está en el carrito
+            const existingProductIndex = carritoActual.findIndex(item => 
+                item.producto === currentProduct.name && item.categoria === currentProduct.category
+            );
+            
+            if (existingProductIndex !== -1) {
+                // Si ya existe, aumentar la cantidad
+                carritoActual[existingProductIndex].cantidad += currentQuantity;
+            } else {
+                // Si no existe, agregar nuevo producto
+                carritoActual.push({
+                    producto: currentProduct.name,
+                    categoria: currentProduct.category,
+                    precio: currentProduct.price,
+                    cantidad: currentQuantity,
+                    imagen: currentProduct.image, // CORREGIDO: Se guarda la imagen
+                    descripcion: currentProduct.description
+                });
+            }
+            
+            // Guardar en localStorage
+            localStorage.setItem('carritoFruteria', JSON.stringify(carritoActual));
+            
+            // Actualizar contador del carrito
+            actualizarContadorCarrito();
+            
+            // Mostrar mensaje de confirmación
+            const total = (currentProduct.price * currentQuantity).toFixed(2);
+            showConfirmationMessage(`Se agregaron ${currentQuantity} KG de ${currentProduct.name} a los pedidos`);
+            
+            closeModal();
+        }
+        
+        // Funciones para el modal de ayuda
+        function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'flex';
+        }
+        
+        function closeHelpModal() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+        
+        // Cerrar modales al hacer clic fuera de ellos
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            const helpModal = document.getElementById('helpModal');
+            
+            if (event.target === modal) {
+                closeModal();
+            }
+            
+            if (event.target === helpModal) {
+                closeHelpModal();
+            }
+        }
+
+        // Actualizar contador al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarContadorCarrito();
+            
+            // También actualizar cada 2 segundos por si hay cambios desde otras pestañas
+            setInterval(actualizarContadorCarrito, 2000);
+            
+            // Determinar qué página está activa y resaltar el menú correspondiente
+            setActiveNavigation();
+        });
+
+        // Escuchar cambios en el storage para actualizar en tiempo real
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'carritoFruteria') {
+                actualizarContadorCarrito();
+            }
+        });
+
+        // Función para agregar directamente al carrito (para testing)
+        function agregarDirectoAlCarrito(nombre, precio, imagen) {
+            const carritoActual = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
+            
+            carritoActual.push({
+                producto: nombre,
+                categoria: 'Verduras',
+                precio: precio,
+                cantidad: 1,
+                imagen: imagen
+            });
+            
+            localStorage.setItem('carritoFruteria', JSON.stringify(carritoActual));
+            actualizarContadorCarrito();
+            showConfirmationMessage(`¡${nombre} agregado al carrito!`);
+        }
+        
+        // ===== CÓDIGO PARA LA NAVEGACIÓN ACTIVA =====
+        
+        // Función para determinar qué página está activa
+        function setActiveNavigation() {
+            // Obtener el nombre del archivo actual
+            const currentPage = window.location.pathname.split('/').pop() || 'verduras.html';
+            
+            // Quitar la clase activa de todos los elementos de navegación
+            document.querySelectorAll('nav ul li').forEach(item => {
+                item.classList.remove('active-nav-item');
+            });
+            
+            // Quitar la clase activa de todos los elementos del dropdown
+            document.querySelectorAll('.dropdown-content a').forEach(item => {
+                item.classList.remove('active-dropdown-item');
+            });
+            
+            // Determinar qué elemento debe estar activo según la página actual
+            if (currentPage === 'Beta1.html' || currentPage === 'index.html' || currentPage === '') {
+                document.getElementById('nav-inicio').classList.add('active-nav-item');
+            } else if (currentPage === 'frutas.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-frutas').classList.add('active-dropdown-item');
+            } else if (currentPage === 'verduras.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-verduras').classList.add('active-dropdown-item');
+            } else if (currentPage === 'carne.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-carne').classList.add('active-dropdown-item');
+            } else if (currentPage === 'tornachiles.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-tornachiles').classList.add('active-dropdown-item');
+            } else if (currentPage === 'Contacto.html') {
+                document.getElementById('nav-contacto').classList.add('active-nav-item');
+            } else if (currentPage === 'carrito.html') {
+                document.getElementById('nav-pedidos').classList.add('active-nav-item');
+            }
+        }
+    </script>
+</body>
+</html>

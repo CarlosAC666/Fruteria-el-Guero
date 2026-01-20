@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Frutería el Güero</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .carrito-container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .carrito-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .carrito-items {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .resumen-pedido {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .carrito-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+        
+        .item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .item-info {
+            flex-grow: 1;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .item-category {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .item-price {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        
+        .item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity-display {
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .remove-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .item-total {
+            font-weight: bold;
+            color: #333;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        .resumen-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+        
+        .resumen-total {
+            border-top: 2px solid #2e7d32;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #2e7d32;
+        }
+        
+        .btn-enviar-pedido {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-enviar-pedido:hover {
+            background: #1b5e20;
+        }
+        
+        .btn-enviar-pedido:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-cart img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2e7d32;
+            border-bottom: 2px solid #2e7d32;
+            padding-bottom: 10px;
+        }
+        
+        .cliente-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .cliente-input:focus {
+            outline: none;
+            border-color: #2e7d32;
+        }
+        
+        .localidad-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .localidad-select:focus {
+            outline: none;
+            border-color: #2e7d32;
+        }
+
+        /* Estilos para el mensaje de confirmación */
+        .confirmation-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .confirmation-message.show {
+            transform: translateY(0);
+        }
+
+        .confirmation-message.error {
+            background-color: #f44336;
+        }
+
+        /* Estilos para el botón de ayuda en el header */
+        .help-btn-header {
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        /* Estilos para el modal de ayuda */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .help-modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .help-modal-header {
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .help-modal-title {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .help-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .help-modal-body {
+            padding: 20px;
+        }
+
+        .help-step {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background-color: #0CC078;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2e7d32;
+        }
+        
+        /* Estilos para la navegación activa - SOLO PARA EL MENÚ PRINCIPAL */
+        .active-nav-item {
+            background-color: #4CAF50;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .active-nav-item a {
+            color: white !important;
+        }
+        
+        /* Estilos para el dropdown activo - SOLO LA OPCIÓN ACTIVA */
+        .dropdown-content a.active-dropdown-item {
+            background-color: #4CAF50 !important;
+            color: white !important;
+        }
+        
+        /* Mantener el estilo original para las demás opciones del dropdown */
+        .dropdown-content a {
+            background-color: white !important;
+            color: #333 !important;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f1f1f1 !important;
+            color: #333 !important;
+        }
+        
+        /* Estilos para la advertencia de nombre */
+        .nombre-warning {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none;
+            padding: 8px;
+            background-color: #ffeaea;
+            border-radius: 4px;
+            border-left: 3px solid #f44336;
+        }
+        
+        .nombre-warning i {
+            margin-right: 5px;
+        }
+        
+        .nombre-format-info {
+            font-size: 11px;
+            color: #666;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mensaje de confirmación -->
+    <div id="confirmationMessage" class="confirmation-message"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                 <a href="Beta1.html#inicio">
+        <img src="Fruteria logo.png" width="130" height="130">
+    </a> Frutería el Güero
+            </div>
+            <nav>
+                <ul>
+                    <li id="nav-inicio"><a href="Beta1.html#inicio"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li class="dropdown" id="nav-productos">
+                        <a href="#productos"><i class="fas fa-shopping-basket"></i> Productos</a>
+                        <div class="dropdown-content">
+                            <a href="frutas.html" id="dropdown-frutas"><i class="fas fa-apple-alt"></i> Frutas</a>
+                            <a href="verduras.html" id="dropdown-verduras"><i class="fas fa-leaf"></i> Verduras</a>
+                            <a href="carne.html" id="dropdown-carne"><i class="fas fa-drumstick-bite"></i> Carne</a>
+                            <a href="tornachiles.html" id="dropdown-tornachiles"><i class="fas fa-pepper-hot"></i> Tornachiles</a>
+                        </div>
+                    </li>
+                    <li id="nav-contacto"><a href="Contacto.html"><i class="fas fa-envelope"></i> Contacto</a></li>
+                    <li id="nav-pedidos"><a href="carrito.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+                    <li><a class="help-btn-header" onclick="openHelpModal()"><i class="fas fa-question-circle"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Carrito de Compras -->
+    <section class="carrito-container">
+        <h2 class="section-title">Sección de Pedidos</h2>
+        
+        <div class="carrito-content">
+            <div class="carrito-items">
+                <div id="lista-carrito">
+                    <div class="empty-cart">
+                        <img src="" alt="Carrito vacío">
+                        <h3>Tu carrito de pedidos esta vacio</h3>
+                        <p></p>
+                        <div style="margin-top: 20px;">
+                            <a href="frutas.html" style="background: #2e7d32; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; margin: 5px;">
+                                Ver Frutas
+                            </a>
+                            <a href="verduras.html" style="background: #2e7d32; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; margin: 5px;">
+                                Ver Verduras
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resumen-pedido">
+                <h3>Resumen del Pedido</h3>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="nombre-cliente" style="display: block; margin-bottom: 5px; font-weight: bold;">Tu nombre completo:</label>
+                    <input type="text" id="nombre-cliente" class="cliente-input" >
+                    <div id="nombre-warning" class="nombre-warning">
+                        <i class="fas fa-exclamation-triangle"></i> <span id="warning-text"></span>
+                    </div>
+                    <div class="nombre-format-info">
+                        
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="localidad-cliente" style="display: block; margin-bottom: 5px; font-weight: bold;">Tu localidad:</label>
+                    <select id="localidad-cliente" class="localidad-select">
+                        <option value="">Selecciona tu localidad</option>
+                        <option value="Cieneguilla">Cieneguilla</option>
+                        <option value="Rojas">Rojas</option>
+                        <option value="La Ochoa">La Ochoa</option>
+                        <option value="Pilares">Pilares</option>
+                        <option value="Otra">Otra localidad</option>
+                    </select>
+                </div>
+                
+                <div id="resumen-detalles">
+                    <div class="resumen-line">
+                        <span>Productos:</span>
+                        <span id="total-productos">0</span>
+                    </div>
+                    <div class="resumen-line">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="resumen-line" style="font-size: 12px; color: #666;">
+                        <span>Envío:</span>
+                        <span>Gratis</span>
+                    </div>
+                    <div class="resumen-line resumen-total">
+                        <span>Total:</span>
+                        <span id="total-pedido">$0.00</span>
+                    </div>
+                </div>
+                
+                <button id="btn-enviar-pedido" class="btn-enviar-pedido" disabled>
+                    Enviar Pedido a la Tienda
+                </button>
+                
+                <div style="font-size: 12px; color: #666; margin-top: 10px; text-align: center;">
+                    Tu pedido llegará directamente a Frutería el Güero
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de ayuda -->
+    <div id="helpModal" class="help-modal">
+        <div class="help-modal-content">
+            <div class="help-modal-header">
+                <h2 class="help-modal-title">Cómo hacer un pedido</h2>
+                <span class="help-close-btn" onclick="closeHelpModal()">&times;</span>
+            </div>
+            <div class="help-modal-body">
+                <div class="help-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Explora nuestros productos</div>
+                        <p>Navega por nuestras categorías de frutas, verduras, carnes y tornachiles para ver todos los productos disponibles.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Selecciona un producto</div>
+                        <p>Haz clic en el botón "Ver Producto" de cualquier artículo que te interese para ver más detalles.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Selecciona la cantidad</div>
+                        <p>En la ventana emergente, usa los botones + y - para seleccionar la cantidad deseada. Para frutas, verduras y carnes puedes seleccionar medios kilos.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Añade al carrito</div>
+                        <p>Haz clic en "Añadir al Carrito" para agregar el producto con la cantidad seleccionada a tu pedido.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Revisa y finaliza tu pedido</div>
+                        <p>Haz clic en el botón de carrito en la esquina inferior derecha para ver todos los productos seleccionados y completar tu pedido.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-title">Confirma tu pedido</div>
+                        <p>En la página de pedidos, revisa los productos, cantidades y precios. Si todo está correcto, confirma tu pedido para que lo preparemos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <img src="imagenes\Fruteria.png" width="180" height="180">
+                </div>
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p><i class="fas fa-phone" style="color: #FCFC99;"></i> +52 1 675 871 0267</p>
+                    <p><i class="fas fa-map-marker-alt" style="color: #FCFC99;"></i> Cieneguilla, Rojas, La Ochoa, Pilares</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Horario</h3>
+                    <p>Martes a Viernes: 8:00 - 20:00</p>
+                    <p>Domingos: 10:00 - 14:00</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 Frutería el Güero. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let carrito = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
+        const nombreClienteInput = document.getElementById('nombre-cliente');
+        const localidadClienteSelect = document.getElementById('localidad-cliente');
+        const btnEnviarPedido = document.getElementById('btn-enviar-pedido');
+        const nombreWarning = document.getElementById('nombre-warning');
+        const warningText = document.getElementById('warning-text');
+
+        // Función para validar un nombre
+        function validarNombre(nombre) {
+            // Eliminar espacios extra al inicio y final
+            nombre = nombre.trim();
+            
+            // Verificar si está vacío
+            if (nombre === '') {
+                return {
+                    isValid: false,
+                    message: "Por favor, ingresa tu nombre completo."
+                };
+            }
+            
+            // Verificar longitud mínima
+            if (nombre.length < 2) {
+                return {
+                    isValid: false,
+                    message: "El nombre debe tener al menos 2 caracteres."
+                };
+            }
+            
+            // Verificar que no contenga números
+            if (/[0-9]/.test(nombre)) {
+                return {
+                    isValid: false,
+                    message: "El nombre no debe contener números."
+                };
+            }
+            
+            // Verificar que no contenga caracteres especiales (excepto espacios y letras con acento)
+            if (/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/.test(nombre)) {
+                return {
+                    isValid: false,
+                    message: "El nombre no debe contener caracteres especiales."
+                };
+            }
+            
+            // Verificar que tenga al menos 2 palabras (nombre y al menos un apellido)
+            const words = nombre.split(/\s+/);
+            if (words.length < 2) {
+                return {
+                    isValid: false,
+                    message: "Por favor, ingresa al menos un nombre y un apellido."
+                };
+            }
+            
+            // Verificar que no tenga más de 4 palabras (nombre + hasta 3 apellidos)
+            if (words.length > 4) {
+                return {
+                    isValid: false,
+                    message: "Máximo 4 palabras permitidas (nombre y hasta 3 apellidos)."
+                };
+            }
+            
+            // Verificar que cada palabra tenga al menos 2 caracteres
+            for (let word of words) {
+                if (word.length < 2) {
+                    return {
+                        isValid: false,
+                        message: "Cada palabra debe tener al menos 2 caracteres."
+                    };
+                }
+            }
+            
+            // Verificar formato de capitalización (primera letra mayúscula, resto minúsculas)
+            for (let word of words) {
+                const primeraLetra = word.charAt(0);
+                const restoPalabra = word.slice(1);
+                
+                // Verificar que la primera letra sea mayúscula
+                if (primeraLetra !== primeraLetra.toUpperCase() || primeraLetra.toUpperCase() === primeraLetra.toLowerCase()) {
+                    return {
+                        isValid: false,
+                        message: "Cada palabra debe comenzar con mayúscula."
+                    };
+                }
+                
+                // Verificar que el resto de letras sean minúsculas
+                if (restoPalabra !== restoPalabra.toLowerCase()) {
+                    return {
+                        isValid: false,
+                        message: "Solo la primera letra debe ser mayúscula, el resto minúsculas."
+                    };
+                }
+            }
+            
+            return {
+                isValid: true,
+                message: "¡Nombre válido! Formato correcto."
+            };
+        }
+
+        // Función para mostrar advertencia de nombre
+        function mostrarAdvertenciaNombre(mostrar, mensaje = '') {
+            if (mostrar) {
+                warningText.textContent = mensaje;
+                nombreWarning.style.display = 'block';
+            } else {
+                nombreWarning.style.display = 'none';
+            }
+        }
+
+        // Función para mostrar mensaje de confirmación
+        function showConfirmationMessage(message, isError = false) {
+            const messageElement = document.getElementById('confirmationMessage');
+            messageElement.textContent = message;
+            messageElement.classList.remove('error');
+            
+            if (isError) {
+                messageElement.classList.add('error');
+            }
+            
+            messageElement.classList.add('show');
+            
+            // Ocultar el mensaje después de 3 segundos
+            setTimeout(() => {
+                messageElement.classList.remove('show');
+            }, 3000);
+        }
+
+        // Función para determinar el incremento según el tipo de producto
+        function obtenerIncremento(categoria, producto) {
+            // Tornachiles y lechugas se incrementan de 1 en 1
+            if (categoria === 'tornachiles' || producto.toLowerCase().includes('lechuga')) {
+                return 1;
+            }
+            // Las demás frutas, verduras y carnes se incrementan de 0.5 en 0.5
+            return 0.5;
+        }
+
+        // Función para formatear la cantidad según el tipo de producto
+        function formatearCantidad(cantidad, categoria, producto) {
+            const incremento = obtenerIncremento(categoria, producto);
+            
+            if (incremento === 1) {
+                // Para productos que se venden por unidad
+                return `${cantidad} ${cantidad === 1 ? 'unidad' : 'unidades'}`;
+            } else {
+                // Para productos que se venden por peso
+                return `${cantidad} ${cantidad === 1 ? 'kilo' : 'kilos'}`;
+            }
+        }
+
+        function actualizarCarrito() {
+            const listaCarrito = document.getElementById('lista-carrito');
+            const totalProductos = document.getElementById('total-productos');
+            const subtotalElement = document.getElementById('subtotal');
+            const totalPedidoElement = document.getElementById('total-pedido');
+
+            if (carrito.length === 0) {
+                listaCarrito.innerHTML = `
+                    <div class="empty-cart">
+                    
+                        <h3>Tu carrito está vacío</h3>
+                        <p>Agrega productos desde nuestras secciones</p>
+                        <div style="margin-top: 20px;">
+                            <a href="frutas.html" style="background: #2e7d32; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; margin: 5px;">
+                                Ver Frutas
+                            </a>
+                            <a href="verduras.html" style="background: #2e7d32; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; margin: 5px;">
+                                Ver Verduras
+                            </a>
+                        </div>
+                    </div>
+                `;
+                totalProductos.textContent = '0';
+                subtotalElement.textContent = '$0.00';
+                totalPedidoElement.textContent = '$0.00';
+                btnEnviarPedido.disabled = true;
+                return;
+            }
+
+            let html = '';
+            let subtotal = 0;
+            let totalProductosCount = 0;
+
+            carrito.forEach((item, index) => {
+                const itemTotal = item.precio * item.cantidad;
+                subtotal += itemTotal;
+                totalProductosCount += item.cantidad;
+
+                // Verificar si el producto tiene imagen, si no, usar una por defecto
+                const imagenSrc = item.imagen || 'placeholder-producto.jpg';
+                
+                // Formatear la cantidad según el tipo de producto
+                const cantidadFormateada = formatearCantidad(item.cantidad, item.categoria, item.producto);
+
+                html += `
+                    <div class="carrito-item">
+                        <img src="${imagenSrc}" alt="${item.producto}" class="item-image">
+                        <div class="item-info">
+                            <div class="item-name">${item.producto}</div>
+                            <div class="item-category">${item.categoria}</div>
+                            <div class="item-price">$${item.precio} ${obtenerIncremento(item.categoria, item.producto) === 1 ? 'c/u' : 'por kilo'}</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn" onclick="cambiarCantidad(${index}, -${obtenerIncremento(item.categoria, item.producto)})">-</button>
+                            <span class="quantity-display">${cantidadFormateada}</span>
+                            <button class="quantity-btn" onclick="cambiarCantidad(${index}, ${obtenerIncremento(item.categoria, item.producto)})">+</button>
+                        </div>
+                        <div class="item-total">$${itemTotal.toFixed(2)}</div>
+                        <button class="remove-btn" onclick="eliminarDelCarrito(${index})">🗑️</button>
+                    </div>
+                `;
+            });
+
+            listaCarrito.innerHTML = html;
+            totalProductos.textContent = totalProductosCount;
+            subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+            totalPedidoElement.textContent = `$${subtotal.toFixed(2)}`;
+
+            // Habilitar botón si hay productos, nombre y localidad
+            const nombreValido = nombreClienteInput.value.trim();
+            const localidadValida = localidadClienteSelect.value;
+            const nombreValidado = validarNombre(nombreValido);
+            
+            btnEnviarPedido.disabled = carrito.length === 0 || !nombreValido || !localidadValida || !nombreValidado.isValid;
+        }
+
+        function cambiarCantidad(index, cambio) {
+            const nuevoValor = carrito[index].cantidad + cambio;
+            // Verificar que la nueva cantidad sea válida (mínimo el valor del incremento)
+            const incremento = obtenerIncremento(carrito[index].categoria, carrito[index].producto);
+            const minimo = incremento;
+            
+            if (nuevoValor >= minimo) {
+                carrito[index].cantidad = nuevoValor;
+                guardarCarrito();
+                actualizarCarrito();
+            }
+        }
+
+        function eliminarDelCarrito(index) {
+            const productoEliminado = carrito[index].producto;
+            carrito.splice(index, 1);
+            guardarCarrito();
+            actualizarCarrito();
+            showConfirmationMessage(`🗑️ ${productoEliminado} eliminado del carrito`);
+        }
+
+        function guardarCarrito() {
+            localStorage.setItem('carritoFruteria', JSON.stringify(carrito));
+        }
+
+        function enviarPedido() {
+            const cliente = nombreClienteInput.value.trim();
+            const localidad = localidadClienteSelect.value;
+            
+            if (!cliente) {
+                showConfirmationMessage('❌ Por favor, ingresa tu nombre', true);
+                return;
+            }
+
+            if (!localidad) {
+                showConfirmationMessage('❌ Por favor, selecciona tu localidad', true);
+                return;
+            }
+
+            if (carrito.length === 0) {
+                showConfirmationMessage('❌ El carrito está vacío', true);
+                return;
+            }
+
+            // Validar el nombre antes de enviar
+            const nombreValidado = validarNombre(cliente);
+            if (!nombreValidado.isValid) {
+                showConfirmationMessage('❌ Por favor, corrige el formato de tu nombre', true);
+                return;
+            }
+
+            // Enviar a la página de pedidos (si está abierta)
+            if (window.opener && typeof window.opener.recibirPedidoFruteria === 'function') {
+                window.opener.recibirPedidoFruteria({
+                    cliente: cliente,
+                    localidad: localidad,
+                    productos: carrito,
+                    total: carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0)
+                });
+            } else {
+                // Guardar en localStorage para que la página de pedidos lo recoja
+                const pedidosPendientes = JSON.parse(localStorage.getItem('pedidosPendientes')) || [];
+                pedidosPendientes.push({
+                    cliente: cliente,
+                    localidad: localidad,
+                    productos: carrito,
+                    total: carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0),
+                    timestamp: new Date().toLocaleString()
+                });
+                localStorage.setItem('pedidosPendientes', JSON.stringify(pedidosPendientes));
+            }
+
+            // Mostrar confirmación - MODIFICADO
+            showConfirmationMessage(`¡Pedido enviado! Gracias ${cliente}. Tu pedido ha sido enviado a Frutería el Güero, para ${localidad}.`);
+
+            // Limpiar carrito
+            carrito = [];
+            guardarCarrito();
+            actualizarCarrito();
+            nombreClienteInput.value = '';
+            localidadClienteSelect.value = '';
+        }
+
+        // Funciones para el modal de ayuda
+        function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'flex';
+        }
+        
+        function closeHelpModal() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            const helpModal = document.getElementById('helpModal');
+            
+            if (event.target === helpModal) {
+                closeHelpModal();
+            }
+        }
+
+        // Cerrar modal con la tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeHelpModal();
+            }
+        });
+
+        // Event listeners
+        nombreClienteInput.addEventListener('input', function() {
+            const nombre = this.value.trim();
+            
+            if (nombre === '') {
+                mostrarAdvertenciaNombre(false);
+            } else {
+                const nombreValidado = validarNombre(nombre);
+                mostrarAdvertenciaNombre(!nombreValidado.isValid, nombreValidado.message);
+            }
+            
+            actualizarCarrito();
+        });
+        
+        localidadClienteSelect.addEventListener('change', actualizarCarrito);
+        btnEnviarPedido.addEventListener('click', enviarPedido);
+
+        // Inicializar
+        actualizarCarrito();
+
+        // Función global para que otras páginas agreguen productos
+        window.agregarAlCarrito = function(producto, categoria, precio, imagen) {
+            // Determinar el incremento inicial según el tipo de producto
+            const incrementoInicial = obtenerIncremento(categoria, producto);
+            
+            // Verificar si el producto ya está en el carrito
+            const existingIndex = carrito.findIndex(item => 
+                item.producto === producto && item.categoria === categoria
+            );
+
+            if (existingIndex !== -1) {
+                // Si ya existe, aumentar cantidad según el incremento
+                carrito[existingIndex].cantidad += incrementoInicial;
+            } else {
+                // Si no existe, agregar nuevo item con el incremento inicial
+                carrito.push({
+                    producto: producto,
+                    categoria: categoria,
+                    precio: precio,
+                    cantidad: incrementoInicial,
+                    imagen: imagen
+                });
+            }
+
+            guardarCarrito();
+            actualizarCarrito();
+            
+            // Mostrar feedback - MODIFICADO
+            showConfirmationMessage(`@ ¡${producto} agregado al carrito!`);
+        };
+        
+        // ===== CÓDIGO PARA LA NAVEGACIÓN ACTIVA =====
+        
+        // Función para determinar qué página está activa
+        function setActiveNavigation() {
+            // Obtener el nombre del archivo actual
+            const currentPage = window.location.pathname.split('/').pop() || 'carrito.html';
+            
+            // Quitar la clase activa de todos los elementos de navegación
+            document.querySelectorAll('nav ul li').forEach(item => {
+                item.classList.remove('active-nav-item');
+            });
+            
+            // Quitar la clase activa de todos los elementos del dropdown
+            document.querySelectorAll('.dropdown-content a').forEach(item => {
+                item.classList.remove('active-dropdown-item');
+            });
+            
+            // Determinar qué elemento debe estar activo según la página actual
+            if (currentPage === 'Beta1.html' || currentPage === 'index.html' || currentPage === '') {
+                document.getElementById('nav-inicio').classList.add('active-nav-item');
+            } else if (currentPage === 'frutas.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-frutas').classList.add('active-dropdown-item');
+            } else if (currentPage === 'verduras.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-verduras').classList.add('active-dropdown-item');
+            } else if (currentPage === 'carne.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-carne').classList.add('active-dropdown-item');
+            } else if (currentPage === 'tornachiles.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-tornachiles').classList.add('active-dropdown-item');
+            } else if (currentPage === 'Contacto.html') {
+                document.getElementById('nav-contacto').classList.add('active-nav-item');
+            } else if (currentPage === 'carrito.html') {
+                document.getElementById('nav-pedidos').classList.add('active-nav-item');
+            }
+        }
+        
+        // Ejecutar la función cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveNavigation();
+        });
+    </script>
+</body>
+</html>

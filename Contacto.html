@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información - Frutería el Güero</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            background-color: #2e7d32;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .modal-description {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .quantity-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .quantity-display {
+            margin: 0 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .add-to-cart-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .add-to-cart-btn:hover {
+            background-color: #1b5e20;
+        }
+        
+        /* Hacer las tarjetas clickeables */
+        .product-card {
+            cursor: pointer;
+        }
+
+        /* Botón para ver carrito */
+        .view-cart-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2e7d32;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+
+        .cart-count {
+            background: #ff5722;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Estilos para el mensaje de confirmación */
+        .confirmation-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .confirmation-message.show {
+            transform: translateY(0);
+        }
+        
+        /* Estilos específicos para la página de información */
+        .info-section {
+            padding: 60px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .info-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .info-card h3 {
+            color: #2e7d32;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 22px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        .info-card p {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .info-icon {
+            font-size: 40px;
+            color: #FCFC99;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .location-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .location-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .location-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .location-name {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        
+        .location-address {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .team-member {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .team-member img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid #2e7d32;
+        }
+        
+        .team-member h4 {
+            margin: 10px 0 5px;
+            color: #2e7d32;
+        }
+        
+        .team-member p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2e7d32;
+            font-size: 32px;
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: #2e7d32;
+            margin: 10px auto;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+        
+        .values-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .values-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .values-list li:before {
+            content: "✓";
+            color: #2e7d32;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .service-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .service-icon {
+            background: #2e7d32;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .service-content h4 {
+            margin: 0 0 8px;
+            color: #2e7d32;
+        }
+        
+        .service-content p {
+            margin: 0;
+            color: #666;
+        }
+        
+        /* Estilos para los rectángulos de imágenes */
+        .image-rectangles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .image-rectangle {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .image-rectangle:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .rectangle-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .rectangle-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .rectangle-caption {
+            padding: 15px;
+            text-align: center;
+            color: #555;
+            font-size: 16px;
+        }
+        
+        /* Modal para visualizar imágenes */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 1100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+        
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+        }
+        
+        .image-modal-caption {
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 1110;
+            transition: color 0.3s;
+        }
+        
+        .image-modal-close:hover {
+            color: #ff5722;
+        }
+
+        /* Estilos para el botón de ayuda en el header */
+        .help-btn-header {
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        /* Estilos para el modal de ayuda */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .help-modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .help-modal-header {
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .help-modal-title {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .help-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .help-modal-body {
+            padding: 20px;
+        }
+
+        .help-step {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background-color: #0CC078;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2e7d32;
+        }
+        
+        /* Estilos para la navegación activa - SOLO PARA EL MENÚ PRINCIPAL */
+        .active-nav-item {
+            background-color: #4CAF50;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .active-nav-item a {
+            color: white !important;
+        }
+        
+        /* Estilos para el dropdown activo - SOLO LA OPCIÓN ACTIVA */
+        .dropdown-content a.active-dropdown-item {
+            background-color: #4CAF50 !important;
+            color: white !important;
+        }
+        
+        /* Mantener el estilo original para las demás opciones del dropdown */
+        .dropdown-content a {
+            background-color: white !important;
+            color: #333 !important;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f1f1f1 !important;
+            color: #333 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mensaje de confirmación -->
+    <div id="confirmationMessage" class="confirmation-message"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <a href="Beta1.html">
+        <img src="Fruteria logo.png" width="130" height="130">
+    </a> Frutería el Güero
+            </div>
+            <nav>
+                <ul>
+                    <li id="nav-inicio"><a href="Beta1.html#inicio"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li class="dropdown" id="nav-productos">
+                        <a href="#productos"><i class="fas fa-shopping-basket"></i> Productos</a>
+                        <div class="dropdown-content">
+                            <a href="frutas.html" id="dropdown-frutas"><i class="fas fa-apple-alt"></i> Frutas</a>
+                            <a href="verduras.html" id="dropdown-verduras"><i class="fas fa-leaf"></i> Verduras</a>
+                            <a href="carne.html" id="dropdown-carne"><i class="fas fa-drumstick-bite"></i> Carne</a>
+                            <a href="tornachiles.html" id="dropdown-tornachiles"><i class="fas fa-pepper-hot"></i> Tornachiles</a>
+                        </div>
+                    </li>
+                    <li id="nav-contacto"><a href="Contacto.html"><i class="fas fa-envelope"></i> Contacto</a></li>
+                    <li id="nav-pedidos"><a href="carrito.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+                    <li><a class="help-btn-header" onclick="openHelpModal()"><i class="fas fa-question-circle"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Sección de Información -->
+    <section class="info-section">
+        <div class="info-container">
+            <h2 class="section-title">Sobre Nosotros</h2>
+            <p class="section-subtitle">Conoce más sobre Frutería el Güero, nuestra historia, valores y servicios que ofrecemos para brindarte la mejor calidad en productos frescos y naturales.</p>
+            
+            <!-- Rectángulos para imágenes -->
+            <div class="image-rectangles">
+                <div class="image-rectangle">
+                    <img src="imagenes\Foto2.jpg" alt="Nuestra frutería" class="rectangle-image" onclick="openImageModal('imagenes/Foto2.jpg', )">
+                    <div class="rectangle-caption">Foto del dueño, Carlos Alberto Cisneros</div>
+                </div>
+                <div class="image-rectangle">
+                    <img src="imagenes\Foto1.jpg" alt="Productos frescos" class="rectangle-image" onclick="openImageModal('imagenes/Foto1.jpg', )">
+                    <div class="rectangle-caption">Foto del puesto y la variedad de frutas y verduras</div>
+                </div>
+            </div>
+            
+            <div class="info-grid">
+                <!-- Historia -->
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-book-open" style="color: #0A9960;"></i></div>
+                    <h3>Nuestra Historia</h3>
+                    <p>Frutería el Güero nació hace más de 15 años con la visión de ofrecer productos frescos y de calidad a las pequeñas comunidades. </p>
+                    <p>Nuestro nombre "El Güero" proviene del fundador, conocido por su aspecto y su sonrisa siempre presente mientras atendía a los clientes.</p>
+                </div>
+                
+                <!-- Ubicaciones -->
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-map-marker-alt" style="color: #0A9960;"></i></div>
+                    <h3>Nuestras Ubicaciones</h3>
+                    <ul class="location-list">
+                        <li>
+                            <span class="location-name">Cieneguilla</span>
+                            <div class="location-address"></div>
+                        </li>
+                        <li>
+                            <span class="location-name">Rojas</span>
+                            <div class="location-address"></div>
+                        </li>
+                        <li>
+                            <span class="location-name">La Ochoa</span>
+                            <div class="location-address"></div>
+                        </li>
+                        <li>
+                            <span class="location-name">Noria del Pilares</span>
+                            <div class="location-address"></div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Servicios -->
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-shopping-cart" style="color: #0A9960;"></i></div>
+                    <h3>Servicios</h3>
+                    <div class="service-item">
+                        <div class="service-icon"><i class="fas fa-truck" style="color: white;"></i></div>
+                        <div class="service-content">
+                            <h4>Entrega a Domicilio</h4>
+                            <p>Servicio de entrega de pedidos a su comunidad.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Teléfono -->
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-phone-alt" style="color: #0A9960;"></i></div>
+                    <h3>Teléfono</h3>
+                    <br>
+                    <div class="service-item">
+                        <div class="service-icon"><i class="fas fa-phone" style="color: white;"></i></div>
+                        <div class="service-content">
+                            <p>675 871 0267</p>
+                        </div>
+                    </div>
+                    
+                    <div class="service-item">
+                        <div class="service-icon"><i class="fa-brands fa-square-whatsapp" style="color: white; cursor: pointer;" onclick="redirectToWhatsApp()"></i></div>
+                        <div class="service-content">
+                            <p>+52 1 675 871 0267</p>
+                        </div>
+                    </div> 
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal para visualizar imágenes -->
+    <div id="imageModal" class="image-modal">
+        <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+        <div class="image-modal-content">
+            <img id="modalImage" src="" alt="">
+            <div class="image-modal-caption" id="modalImageCaption"></div>
+        </div>
+    </div>
+
+    <!-- Modal de ayuda -->
+    <div id="helpModal" class="help-modal">
+        <div class="help-modal-content">
+            <div class="help-modal-header">
+                <h2 class="help-modal-title">Cómo hacer un pedido</h2>
+                <span class="help-close-btn" onclick="closeHelpModal()">&times;</span>
+            </div>
+            <div class="help-modal-body">
+                <div class="help-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Explora nuestros productos</div>
+                        <p>Navega por nuestras categorías de frutas, verduras, carnes y tornachiles para ver todos los productos disponibles.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Selecciona un producto</div>
+                        <p>Haz clic en el botón "Ver Producto" de cualquier artículo que te interese para ver más detalles.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Selecciona la cantidad</div>
+                        <p>En la ventana emergente, usa los botones + y - para seleccionar la cantidad deseada. Para frutas, verduras y carnes puedes seleccionar medios kilos.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Añade al carrito</div>
+                        <p>Haz clic en "Añadir al Carrito" para agregar el producto con la cantidad seleccionada a tu pedido.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Revisa y finaliza tu pedido</div>
+                        <p>Haz clic en el botón de carrito en la esquina inferior derecha para ver todos los productos seleccionados y completar tu pedido.</p>
+                    </div>
+                </div>
+                
+                <div class="help-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-title">Confirma tu pedido</div>
+                        <p>En la página de pedidos, revisa los productos, cantidades y precios. Si todo está correcto, confirma tu pedido para que lo preparemos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <img src="imagenes\Fruteria.png" width="180" height="180">
+                </div>
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p><i class="fas fa-phone" style="color: #FCFC99;"></i> +52 1 675 871<br>0267</p>
+                    <p><i class="fas fa-map-marker-alt" style="color: #FCFC99;"></i> Cieneguilla, Rojas, La Ochoa, Pilares</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Horario</h3>
+                    <p>Martes a Viernes: 8:00 - 20:00</p>
+                    <p>Domingos: 10:00 - 14:00</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 Frutería el Güero. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentQuantity = 1;
+        let currentProduct = {
+            name: '',
+            price: 0,
+            description: '',
+            image: '',
+            category: 'Tornachiles'
+        };
+
+        // Función para redirigir a WhatsApp
+        function redirectToWhatsApp() {
+            // Número de teléfono en formato internacional sin espacios ni símbolos
+            const phoneNumber = "5216758710267";
+            
+            // Mensaje predefinido (opcional)
+            const defaultMessage = "Hola, me gustaría obtener más información sobre Frutería el Güero.";
+            
+            // Crear el enlace de WhatsApp
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(defaultMessage)}`;
+            
+            // Abrir WhatsApp en una nueva ventana
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Agregar evento al icono de WhatsApp cuando el DOM esté cargado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buscar el icono de WhatsApp por su clase
+            const whatsappIcons = document.querySelectorAll('.fa-brands.fa-square-whatsapp');
+            
+            // Agregar evento click a cada icono de WhatsApp encontrado
+            whatsappIcons.forEach(icon => {
+                // Hacer el icono clickeable
+                icon.style.cursor = 'pointer';
+                
+                // Agregar efecto hover
+                icon.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1)';
+                    this.style.transition = 'transform 0.2s';
+                });
+                
+                icon.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+                
+                // Agregar la funcionalidad de WhatsApp
+                icon.addEventListener('click', redirectToWhatsApp);
+            });
+            
+            // También buscar por el elemento padre (service-icon) si es necesario
+            const whatsappServiceIcons = document.querySelectorAll('.service-icon .fa-brands.fa-square-whatsapp');
+            whatsappServiceIcons.forEach(icon => {
+                icon.style.cursor = 'pointer';
+                
+                icon.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1)';
+                    this.style.transition = 'transform 0.2s';
+                });
+                
+                icon.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+                
+                icon.addEventListener('click', redirectToWhatsApp);
+            });
+            
+            // Determinar qué página está activa y resaltar el menú correspondiente
+            setActiveNavigation();
+        });
+
+        // Función para actualizar el contador del carrito
+        function actualizarContadorCarrito() {
+            const carrito = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
+            const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+        
+        function openModal(name, price, description, image) {
+            currentProduct = {
+                name: name,
+                price: price,
+                description: description,
+                image: image,
+                category: 'Tornachiles'
+            };
+            
+            document.getElementById('modalProductName').textContent = name;
+            document.getElementById('modalProductPrice').textContent = `$${price} pesos`;
+            document.getElementById('modalProductDescription').textContent = description;
+            document.getElementById('productModal').style.display = 'flex';
+            currentQuantity = 1;
+            document.getElementById('quantityDisplay').textContent = currentQuantity;
+        }
+        
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+        
+        function increaseQuantity() {
+            currentQuantity++;
+            document.getElementById('quantityDisplay').textContent = currentQuantity;
+        }
+        
+        function decreaseQuantity() {
+            if (currentQuantity > 1) {
+                currentQuantity--;
+                document.getElementById('quantityDisplay').textContent = currentQuantity;
+            }
+        }
+        
+        // Función para mostrar mensaje de confirmación
+        function showConfirmationMessage(message) {
+            const messageElement = document.getElementById('confirmationMessage');
+            messageElement.textContent = message;
+            messageElement.classList.add('show');
+            
+            // Ocultar el mensaje después de 3 segundos
+            setTimeout(() => {
+                messageElement.classList.remove('show');
+            }, 3000);
+        }
+        
+        function addToCart() {
+            // Obtener carrito actual de localStorage
+            const carritoActual = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
+            
+            // Buscar si el producto ya está en el carrito
+            const existingProductIndex = carritoActual.findIndex(item => 
+                item.producto === currentProduct.name && item.categoria === currentProduct.category
+            );
+            
+            if (existingProductIndex !== -1) {
+                // Si ya existe, aumentar la cantidad
+                carritoActual[existingProductIndex].cantidad += currentQuantity;
+            } else {
+                // Si no existe, agregar nuevo producto
+                carritoActual.push({
+                    producto: currentProduct.name,
+                    categoria: currentProduct.category,
+                    precio: currentProduct.price,
+                    cantidad: currentQuantity,
+                    imagen: currentProduct.image,
+                    descripcion: currentProduct.description
+                });
+            }
+            
+            // Guardar en localStorage
+            localStorage.setItem('carritoFruteria', JSON.stringify(carritoActual));
+            
+            // Actualizar contador del carrito
+            actualizarContadorCarrito();
+            
+            // Mostrar mensaje de confirmación - MODIFICADO
+            const total = (currentProduct.price * currentQuantity);
+            showConfirmationMessage(`Se agregaron ${currentQuantity} botellas de ${currentProduct.name} a los pedidos`);
+            
+            closeModal();
+        }
+        
+        // Funciones para el modal de ayuda
+        function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'flex';
+        }
+        
+        function closeHelpModal() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+        
+        // Cerrar modales al hacer clic fuera de ellos
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            const imageModal = document.getElementById('imageModal');
+            const helpModal = document.getElementById('helpModal');
+            
+            if (event.target === modal) {
+                closeModal();
+            }
+            
+            if (event.target === imageModal) {
+                closeImageModal();
+            }
+            
+            if (event.target === helpModal) {
+                closeHelpModal();
+            }
+        }
+
+        // Actualizar contador al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarContadorCarrito();
+            
+            // También actualizar cada 2 segundos por si hay cambios desde otras pestañas
+            setInterval(actualizarContadorCarrito, 2000);
+        });
+
+        // Escuchar cambios en el storage para actualizar en tiempo real
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'carritoFruteria') {
+                actualizarContadorCarrito();
+            }
+        });
+
+        // Funciones para el modal de imágenes
+        function openImageModal(imageSrc, caption) {
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('modalImageCaption').textContent = caption;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+        
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // Cerrar modal con la tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+                closeHelpModal();
+            }
+        });
+        
+        // ===== CÓDIGO PARA LA NAVEGACIÓN ACTIVA =====
+        
+        // Función para determinar qué página está activa
+        function setActiveNavigation() {
+            // Obtener el nombre del archivo actual
+            const currentPage = window.location.pathname.split('/').pop() || 'Contacto.html';
+            
+            // Quitar la clase activa de todos los elementos de navegación
+            document.querySelectorAll('nav ul li').forEach(item => {
+                item.classList.remove('active-nav-item');
+            });
+            
+            // Quitar la clase activa de todos los elementos del dropdown
+            document.querySelectorAll('.dropdown-content a').forEach(item => {
+                item.classList.remove('active-dropdown-item');
+            });
+            
+            // Determinar qué elemento debe estar activo según la página actual
+            if (currentPage === 'Beta1.html' || currentPage === 'index.html' || currentPage === '') {
+                document.getElementById('nav-inicio').classList.add('active-nav-item');
+            } else if (currentPage === 'frutas.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-frutas').classList.add('active-dropdown-item');
+            } else if (currentPage === 'verduras.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-verduras').classList.add('active-dropdown-item');
+            } else if (currentPage === 'carne.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-carne').classList.add('active-dropdown-item');
+            } else if (currentPage === 'tornachiles.html') {
+                document.getElementById('nav-productos').classList.add('active-nav-item');
+                document.getElementById('dropdown-tornachiles').classList.add('active-dropdown-item');
+            } else if (currentPage === 'Contacto.html') {
+                document.getElementById('nav-contacto').classList.add('active-nav-item');
+            } else if (currentPage === 'carrito.html') {
+                document.getElementById('nav-pedidos').classList.add('active-nav-item');
+            }
+        }
+    </script>
+</body>
+</html>
