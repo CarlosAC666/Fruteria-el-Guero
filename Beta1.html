@@ -7,6 +7,172 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Estilos para el carrusel - VERSIÓN COMPLETAMENTE CORREGIDA */
+        .carousel-section {
+            width: 100%;
+            padding: 20px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .carousel-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            height: 450px;
+        }
+        
+        .carousel-slides {
+            display: flex;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+        
+        .carousel-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: 30px 20px 20px;
+            text-align: center;
+        }
+        
+        .carousel-caption h3 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            color: #FCFC99;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .carousel-caption p {
+            margin: 0;
+            font-size: 18px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(46, 125, 50, 0.9);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 20;
+            opacity: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .carousel-container:hover .carousel-btn {
+            opacity: 1;
+        }
+        
+        .carousel-btn:hover {
+            background-color: #2e7d32;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+        
+        .carousel-btn.prev {
+            left: 25px;
+        }
+        
+        .carousel-btn.next {
+            right: 25px;
+        }
+        
+        .carousel-indicators {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 20;
+        }
+        
+        .carousel-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+        
+        .carousel-indicator:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: scale(1.2);
+        }
+        
+        .carousel-indicator.active {
+            background-color: #2e7d32;
+            border-color: #2e7d32;
+            transform: scale(1.2);
+            box-shadow: 0 0 8px rgba(46, 125, 50, 0.8);
+        }
+        
+        /* Navegación por cursor (hover navigation) */
+        .carousel-hover-nav {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 40%;
+            z-index: 15;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .carousel-container:hover .carousel-hover-nav {
+            opacity: 0.3;
+        }
+        
+        .carousel-hover-nav:hover {
+            opacity: 0.5;
+            background: rgba(46, 125, 50, 0.1);
+        }
+        
+        .carousel-hover-nav.prev-hover {
+            left: 0;
+        }
+        
+        .carousel-hover-nav.next-hover {
+            right: 0;
+        }
+        
         /* Estilos para el modal */
         .modal {
             display: none;
@@ -230,6 +396,7 @@
         }
 
         .help-modal-header {
+            background-color: #2e7d32;
             color: white;
             padding: 15px;
             text-align: center;
@@ -294,6 +461,98 @@
         .active-nav-item a {
             color: white !important;
         }
+        
+        /* Estilos para el buscador */
+        .search-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .search-input {
+            padding: 8px 15px 8px 35px;
+            border: 2px solid #2e7d32;
+            border-radius: 20px;
+            font-size: 14px;
+            width: 200px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            width: 250px;
+            box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            color: #2e7d32;
+            pointer-events: none;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-result-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .search-result-category {
+            font-size: 12px;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .search-result-price {
+            color: #e53935;
+            font-weight: bold;
+        }
+
+        .no-results {
+            padding: 15px;
+            text-align: center;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -322,11 +581,83 @@
                     </li>
                     <li id="nav-contacto"><a href="Contacto.html"><i class="fas fa-envelope"></i> Contacto</a></li>
                     <li id="nav-pedidos"><a href="carrito.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+                    
+                    <!-- Buscador -->
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar productos..." oninput="searchProducts()">
+                        <div id="searchResults" class="search-results"></div>
+                    </div>
+                    
                     <li><a class="help-btn-header" onclick="openHelpModal()"><i class="fas fa-question-circle"></i></a></li>
                 </ul>
             </nav>
         </div>
     </header>
+
+    <!-- Carrusel de imágenes - VERSIÓN FINAL CORREGIDA -->
+    <section class="carousel-section">
+        <div class="carousel-container" id="carouselContainer">
+            <!-- Áreas de navegación por hover -->
+            <div class="carousel-hover-nav prev-hover" onmouseenter="handleHoverNavigation('prev')"></div>
+            <div class="carousel-hover-nav next-hover" onmouseenter="handleHoverNavigation('next')"></div>
+            
+            <!-- Slides del carrusel -->
+            <div class="carousel-slides" id="carouselSlides">
+                <!-- Slide 1 -->
+                <div class="carousel-slide">
+                    <img src="imagenes/Tomates.png" alt="Tomates Frescos">
+                    <div class="carousel-caption">
+                        <h3>Verduras Orgánicas</h3>
+                        <p>Verduras frescas directas del campo</p>
+                    </div>
+                </div>
+                
+                <!-- Slide 2 -->
+                <div class="carousel-slide">
+                    <img src="imagenes/Manzana.png" alt="Frutas Frescas">
+                    <div class="carousel-caption">
+                        <h3>Frutas Frescas</h3>
+                        <p>La mejor selección de frutas de temporada</p>
+                    </div>
+                </div>
+                
+                <!-- Slide 3 -->
+                <div class="carousel-slide">
+                    <img src="imagenes/Pollo.png" alt="Carnes de Calidad">
+                    <div class="carousel-caption">
+                        <h3>Carnes de Calidad</h3>
+                        <p>Cortes seleccionados para tu familia</p>
+                    </div>
+                </div>
+                
+                <!-- Slide 4 -->
+                <div class="carousel-slide">
+                    <img src="imagenes/Tornachiles.png" alt="Tornachiles Artesanales">
+                    <div class="carousel-caption">
+                        <h3>Tornachiles Artesanales</h3>
+                        <p>El sabor tradicional en cada botella</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de navegación -->
+            <button class="carousel-btn prev" onclick="changeSlide('prev')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-btn next" onclick="changeSlide('next')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <!-- Indicadores -->
+            <div class="carousel-indicators" id="carouselIndicators">
+                <button class="carousel-indicator active" onclick="goToSlide(0)"></button>
+                <button class="carousel-indicator" onclick="goToSlide(1)"></button>
+                <button class="carousel-indicator" onclick="goToSlide(2)"></button>
+                <button class="carousel-indicator" onclick="goToSlide(3)"></button>
+            </div>
+        </div>
+    </section>
 
     <!-- Productos -->
     <section class="products-section" id="productos">
@@ -597,6 +928,110 @@
     </footer>
 
     <script>
+        // ===== CARRUSEL CORREGIDO Y FUNCIONAL =====
+        let currentSlideIndex = 0;
+        let carouselInterval;
+        let isHovering = false;
+        let hoverTimeout;
+        const slideIntervalTime = 5000;
+        const hoverDelay = 800; // Retardo para navegación por hover
+        
+        // Inicializar el carrusel
+        function initCarousel() {
+            updateCarouselPosition();
+            startCarouselInterval();
+        }
+        
+        // Actualizar la posición del carrusel
+        function updateCarouselPosition() {
+            const carouselSlides = document.getElementById('carouselSlides');
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            
+            // Mover el carrusel
+            carouselSlides.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+            
+            // Actualizar indicadores
+            indicators.forEach((indicator, index) => {
+                if (index === currentSlideIndex) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+        
+        // Cambiar de slide
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const totalSlides = slides.length;
+            
+            if (direction === 'next') {
+                currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+            } else if (direction === 'prev') {
+                currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+            }
+            
+            updateCarouselPosition();
+            resetCarouselInterval();
+        }
+        
+        // Ir a un slide específico
+        function goToSlide(slideIndex) {
+            currentSlideIndex = slideIndex;
+            updateCarouselPosition();
+            resetCarouselInterval();
+        }
+        
+        // Navegación por hover
+        function handleHoverNavigation(direction) {
+            if (isHovering) return;
+            
+            isHovering = true;
+            
+            // Limpiar timeout anterior si existe
+            if (hoverTimeout) {
+                clearTimeout(hoverTimeout);
+            }
+            
+            // Cambiar de slide después del retardo
+            hoverTimeout = setTimeout(() => {
+                changeSlide(direction);
+                isHovering = false;
+            }, hoverDelay);
+        }
+        
+        // Cancelar hover al salir del área
+        function cancelHover() {
+            if (hoverTimeout) {
+                clearTimeout(hoverTimeout);
+                isHovering = false;
+            }
+        }
+        
+        // Iniciar intervalo automático
+        function startCarouselInterval() {
+            carouselInterval = setInterval(() => {
+                changeSlide('next');
+            }, slideIntervalTime);
+        }
+        
+        // Reiniciar intervalo
+        function resetCarouselInterval() {
+            clearInterval(carouselInterval);
+            startCarouselInterval();
+        }
+        
+        // Pausar carrusel
+        function pauseCarousel() {
+            clearInterval(carouselInterval);
+        }
+        
+        // Reanudar carrusel
+        function resumeCarousel() {
+            startCarouselInterval();
+        }
+        
+        // ===== FUNCIONES EXISTENTES =====
         let currentQuantity = 1;
         let currentProduct = {
             name: '',
@@ -698,7 +1133,7 @@
                     categoria: currentProduct.category,
                     precio: currentProduct.price,
                     cantidad: currentQuantity,
-                    imagen: currentProduct.image, // CORREGIDO: Se guarda la imagen
+                    imagen: currentProduct.image,
                     descripcion: currentProduct.description
                 });
             }
@@ -725,6 +1160,92 @@
             document.getElementById('helpModal').style.display = 'none';
         }
         
+        // ===== FUNCIONES PARA EL BUSCADOR =====
+        function searchProducts() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            const query = searchInput.value.toLowerCase().trim();
+            
+            // Si no hay búsqueda, ocultar resultados
+            if (query.length === 0) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            // Array de productos disponibles
+            const products = [
+                // Frutas
+                { name: "Manzanas Rojas", category: "Frutas", price: 40.00, image: "imagenes/Manzana.png", description: "Manzanas rojas dulces." },
+                { name: "Plátanos", category: "Frutas", price: 20.00, image: "imagenes/Platanos.png", description: "Plátanos maduros y dulces." },
+                { name: "Manzana Verde", category: "Frutas", price: 35.00, image: "imagenes/Manzana verde.png", description: "Manzana Verde para su fruta" },
+                { name: "Papaya", category: "Frutas", price: 37.00, image: "imagenes/Papaya.png", description: "Papaya fresca y sabrosa." },
+                
+                // Verduras
+                { name: "Tomate Rojo", category: "Verduras", price: 27.00, image: "imagenes/Tomates.png", description: "Tomates maduros y sabrosos." },
+                { name: "Cebollas", category: "Verduras", price: 24.00, image: "imagenes/Cebolla.png", description: "Cebollas ideales para guisos." },
+                { name: "Papas", category: "Verduras", price: 20.00, image: "imagenes/papa.png", description: "Papa Lavada." },
+                { name: "Chile Serranos", category: "Verduras", price: 55.00, image: "imagenes/Chile Serranos.png", description: "Chile Serranos." },
+                
+                // Carnes
+                { name: "Pollo", category: "Carne", price: 45.00, image: "imagenes/Pollo.png", description: "Pollo fresco." },
+                { name: "Carne Molida", category: "Carne", price: 200.00, image: "imagenes/Carne Molida.png", description: "Carne molida de res." },
+                { name: "Queso", category: "Carne", price: 160.00, image: "imagenes/Queso.png", description: "Queso para todas sus comidas." },
+                
+                // Tornachiles
+                { name: "Tornachiles", category: "Tornachiles", price: 35.00, image: "imagenes/Tornachiles.png", description: "Tornachiles en botella, ideales para acompañar con sus comidas" }
+            ];
+            
+            // Filtrar productos
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(query) || 
+                product.category.toLowerCase().includes(query) ||
+                product.description.toLowerCase().includes(query)
+            );
+            
+            // Mostrar resultados
+            showSearchResults(filteredProducts, searchResults);
+        }
+
+        function showSearchResults(products, container) {
+            container.innerHTML = '';
+            
+            if (products.length === 0) {
+                container.innerHTML = '<div class="no-results">No se encontraron productos</div>';
+                container.style.display = 'block';
+                return;
+            }
+            
+            products.forEach(product => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.onclick = () => {
+                    openModal(
+                        product.name, 
+                        product.price, 
+                        product.description, 
+                        product.image, 
+                        product.category
+                    );
+                    // Limpiar búsqueda
+                    document.getElementById('searchInput').value = '';
+                    container.style.display = 'none';
+                };
+                
+                resultItem.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="search-result-info">
+                        <div class="search-result-name">${product.name}</div>
+                        <div class="search-result-category">${product.category}</div>
+                    </div>
+                    <div class="search-result-price">$${product.price.toFixed(2)}</div>
+                `;
+                
+                container.appendChild(resultItem);
+            });
+            
+            container.style.display = 'block';
+        }
+
         // Cerrar modales al hacer clic fuera de ellos
         window.onclick = function(event) {
             const modal = document.getElementById('productModal');
@@ -739,54 +1260,59 @@
             }
         }
 
-        // Actualizar contador al cargar la página
+        // Ocultar resultados del buscador al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const searchContainer = document.querySelector('.search-container');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!searchContainer.contains(event.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Inicializar cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar el carrusel
+            initCarousel();
+            
+            // Agregar eventos para pausar/reanudar el carrusel
+            const carouselContainer = document.getElementById('carouselContainer');
+            if (carouselContainer) {
+                carouselContainer.addEventListener('mouseenter', pauseCarousel);
+                carouselContainer.addEventListener('mouseleave', resumeCarousel);
+                
+                // Agregar eventos para cancelar hover al salir
+                const hoverAreas = carouselContainer.querySelectorAll('.carousel-hover-nav');
+                hoverAreas.forEach(area => {
+                    area.addEventListener('mouseleave', cancelHover);
+                });
+            }
+            
+            // Inicializar contador del carrito
             actualizarContadorCarrito();
             
-            // También actualizar cada 2 segundos por si hay cambios desde otras pestañas
+            // Actualizar contador periódicamente
             setInterval(actualizarContadorCarrito, 2000);
             
-            // Determinar qué página está activa y resaltar el menú correspondiente
+            // Determinar qué página está activa
             setActiveNavigation();
         });
 
-        // Escuchar cambios en el storage para actualizar en tiempo real
+        // Escuchar cambios en el storage
         window.addEventListener('storage', function(e) {
             if (e.key === 'carritoFruteria') {
                 actualizarContadorCarrito();
             }
         });
-
-        // Función para agregar directamente al carrito (para testing)
-        function agregarDirectoAlCarrito(nombre, precio, imagen, categoria) {
-            const carritoActual = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
-            
-            carritoActual.push({
-                producto: nombre,
-                categoria: categoria,
-                precio: precio,
-                cantidad: 1,
-                imagen: imagen
-            });
-            
-            localStorage.setItem('carritoFruteria', JSON.stringify(carritoActual));
-            actualizarContadorCarrito();
-            showConfirmationMessage(`¡${nombre} agregado al carrito!`);
-        }
-        
-        // ===== CÓDIGO PARA LA NAVEGACIÓN ACTIVA =====
         
         // Función para determinar qué página está activa
         function setActiveNavigation() {
-            // Obtener el nombre del archivo actual
             const currentPage = window.location.pathname.split('/').pop() || 'Beta1.html';
             
-            // Quitar la clase activa de todos los elementos de navegación
             document.querySelectorAll('nav ul li').forEach(item => {
                 item.classList.remove('active-nav-item');
             });
             
-            // Determinar qué elemento debe estar activo según la página actual
             if (currentPage === 'Beta1.html' || currentPage === 'index.html' || currentPage === '') {
                 document.getElementById('nav-inicio').classList.add('active-nav-item');
             } else if (currentPage === 'frutas.html' || currentPage === 'verduras.html' || 

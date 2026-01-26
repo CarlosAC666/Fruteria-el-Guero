@@ -311,6 +311,98 @@
             background-color: #f1f1f1 !important;
             color: #333 !important;
         }
+        
+        /* Estilos para el buscador */
+        .search-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .search-input {
+            padding: 8px 15px 8px 35px;
+            border: 2px solid #2e7d32;
+            border-radius: 20px;
+            font-size: 14px;
+            width: 200px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            width: 250px;
+            box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            color: #2e7d32;
+            pointer-events: none;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-result-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .search-result-category {
+            font-size: 12px;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .search-result-price {
+            color: #e53935;
+            font-weight: bold;
+        }
+
+        .no-results {
+            padding: 15px;
+            text-align: center;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -339,6 +431,14 @@
                     </li>
                     <li id="nav-contacto"><a href="Contacto.html"><i class="fas fa-envelope"></i> Contacto</a></li>
                     <li id="nav-pedidos"><a href="carrito.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+                    
+                    <!-- Buscador -->
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar productos..." oninput="searchProducts()">
+                        <div id="searchResults" class="search-results"></div>
+                    </div>
+                    
                     <li><a class="help-btn-header" onclick="openHelpModal()"><i class="fas fa-question-circle"></i></a></li>
                 </ul>
             </nav>
@@ -476,6 +576,86 @@
     </footer>
 
     <script>
+        // ===== FUNCIONES PARA EL BUSCADOR =====
+        function searchProducts() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            const query = searchInput.value.toLowerCase().trim();
+            
+            // Si no hay búsqueda, ocultar resultados
+            if (query.length === 0) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            // Array de productos disponibles en esta página (tornachiles)
+            const products = [
+                // Productos de tornachiles de esta página
+                { name: "Tornachiles", category: "Tornachiles", price: 35.00, image: "imagenes/Tornachiles.png", description: "Tornachiles en botella, ideales para acompañar con sus comidas" }
+            ];
+            
+            // Filtrar productos
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(query) || 
+                product.category.toLowerCase().includes(query) ||
+                product.description.toLowerCase().includes(query)
+            );
+            
+            // Mostrar resultados
+            showSearchResults(filteredProducts, searchResults);
+        }
+
+        function showSearchResults(products, container) {
+            container.innerHTML = '';
+            
+            if (products.length === 0) {
+                container.innerHTML = '<div class="no-results">No se encontraron productos</div>';
+                container.style.display = 'block';
+                return;
+            }
+            
+            products.forEach(product => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.onclick = () => {
+                    openModal(
+                        product.name, 
+                        product.price, 
+                        product.description, 
+                        product.image
+                    );
+                    // Limpiar búsqueda
+                    document.getElementById('searchInput').value = '';
+                    container.style.display = 'none';
+                };
+                
+                resultItem.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="search-result-info">
+                        <div class="search-result-name">${product.name}</div>
+                        <div class="search-result-category">${product.category}</div>
+                    </div>
+                    <div class="search-result-price">$${product.price.toFixed(2)}</div>
+                `;
+                
+                container.appendChild(resultItem);
+            });
+            
+            container.style.display = 'block';
+        }
+
+        // Ocultar resultados del buscador al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const searchContainer = document.querySelector('.search-container');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!searchContainer.contains(event.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // ===== FUNCIONES EXISTENTES =====
+        
         let currentQuantity = 1;
         let currentProduct = {
             name: '',
@@ -565,7 +745,7 @@
                     categoria: currentProduct.category,
                     precio: currentProduct.price,
                     cantidad: currentQuantity,
-                    imagen: currentProduct.image, // CORREGIDO: Se guarda la imagen
+                    imagen: currentProduct.image,
                     descripcion: currentProduct.description
                 });
             }
