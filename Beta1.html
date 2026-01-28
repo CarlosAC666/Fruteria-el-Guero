@@ -7,6 +7,219 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ===== ESTILOS PARA EL SISTEMA DE AUTENTICACIÓN ===== */
+        .auth-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .auth-modal {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .auth-modal.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background-color: #f5f5f5;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            color: #666;
+        }
+
+        .auth-tab.active {
+            background-color: white;
+            color: #2e7d32;
+            border-bottom: 3px solid #2e7d32;
+        }
+
+        .auth-form-container {
+            padding: 30px;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-form h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #2e7d32;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #2e7d32;
+            outline: none;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .auth-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        .auth-error {
+            color: #e53935;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .auth-success {
+            color: #2e7d32;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .user-menu {
+            position: relative;
+            display: none;
+        }
+
+        .user-welcome {
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            border-radius: 4px;
+        }
+
+        .user-welcome:hover {
+            background-color: #4CAF50;
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .user-dropdown a {
+            display: block;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-dropdown a:hover {
+            background-color: #f5f5f5;
+            color: #2e7d32;
+        }
+
+        .user-dropdown a:last-child {
+            border-bottom: none;
+            color: #e53935;
+        }
+
+        .user-dropdown a i {
+            margin-right: 8px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-welcome i {
+            font-size: 18px;
+        }
+
+        .login-btn {
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            background-color: #4CAF50;
+        }
+
+        /* Resto de tus estilos existentes... */
         /* Estilos para el carrusel - VERSIÓN COMPLETAMENTE CORREGIDA */
         .carousel-section {
             width: 100%;
@@ -556,6 +769,68 @@
     </style>
 </head>
 <body>
+    <!-- Sistema de Autenticación -->
+    <div id="authOverlay" class="auth-overlay">
+        <div id="authModal" class="auth-modal">
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">Iniciar Sesión</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">Registrarse</button>
+            </div>
+            
+            <div class="auth-form-container">
+                <!-- Formulario de Inicio de Sesión -->
+                <form id="loginForm" class="auth-form active" onsubmit="login(event)">
+                    <h2>Iniciar Sesión</h2>
+                    <div class="form-group">
+                        <label for="loginEmail">Correo Electrónico</label>
+                        <input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" required>
+                        <div id="loginEmailError" class="auth-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Contraseña</label>
+                        <input type="password" id="loginPassword" placeholder="Tu contraseña" required>
+                        <div id="loginPasswordError" class="auth-error"></div>
+                    </div>
+                    <div id="loginError" class="auth-error"></div>
+                    <button type="submit" class="auth-btn">Iniciar Sesión</button>
+                </form>
+                
+                <!-- Formulario de Registro -->
+                <form id="registerForm" class="auth-form" onsubmit="register(event)">
+                    <h2>Crear Cuenta</h2>
+                    <div class="form-group">
+                        <label for="registerName">Nombre Completo</label>
+                        <input type="text" id="registerName" placeholder="Tu nombre completo" required>
+                        <div id="registerNameError" class="auth-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Correo Electrónico</label>
+                        <input type="email" id="registerEmail" placeholder="tucorreo@ejemplo.com" required>
+                        <div id="registerEmailError" class="auth-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone">Teléfono</label>
+                        <input type="tel" id="registerPhone" placeholder="Tu número telefónico">
+                        <div id="registerPhoneError" class="auth-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Contraseña</label>
+                        <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <div id="registerPasswordError" class="auth-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Confirmar Contraseña</label>
+                        <input type="password" id="registerConfirmPassword" placeholder="Repite tu contraseña" required>
+                        <div id="registerConfirmPasswordError" class="auth-error"></div>
+                    </div>
+                    <div id="registerError" class="auth-error"></div>
+                    <div id="registerSuccess" class="auth-success"></div>
+                    <button type="submit" class="auth-btn">Registrarse</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Mensaje de confirmación -->
     <div id="confirmationMessage" class="confirmation-message"></div>
 
@@ -589,12 +864,35 @@
                         <div id="searchResults" class="search-results"></div>
                     </div>
                     
+                    <!-- Menú de Usuario (aparece cuando hay sesión activa) -->
+                    <li class="user-menu" id="userMenu">
+                        <div class="user-welcome" onclick="toggleUserMenu()">
+                            <i class="fa-solid fa-user"></i>
+                            <span id="userName">Usuario</span>
+                            <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
+                            <a href="pedidos.html"><i class="fas fa-history"></i> Mis Pedidos</a>
+                            <a href="direcciones.html"><i class="fas fa-map-marker-alt"></i> Mis Direcciones</a>
+                            <a href="#" onclick="logout()"><i class="fa-solid fa-user"></i> Cerrar Sesión</a>
+                        </div>
+                    </li>
+                    
+                    <!-- Botón de Iniciar Sesión (aparece cuando NO hay sesión activa) -->
+                    <li id="loginBtnContainer">
+                        <a class="login-btn" onclick="openAuthModal()">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    </li>
+                    
                     <li><a class="help-btn-header" onclick="openHelpModal()"><i class="fas fa-question-circle"></i></a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
+    <!-- Contenido principal (resto del código permanece igual) -->
     <!-- Carrusel de imágenes - VERSIÓN FINAL CORREGIDA -->
     <section class="carousel-section">
         <div class="carousel-container" id="carouselContainer">
@@ -928,6 +1226,261 @@
     </footer>
 
     <script>
+        // ===== SISTEMA DE AUTENTICACIÓN =====
+        // Usuarios de ejemplo (en un sistema real, esto estaría en el servidor)
+        const exampleUsers = [
+            {
+                id: 1,
+                name: "Juan Pérez",
+                email: "juan@ejemplo.com",
+                phone: "5566778899",
+                password: "password123"
+            },
+            {
+                id: 2,
+                name: "María García",
+                email: "maria@ejemplo.com",
+                phone: "5512345678",
+                password: "clave456"
+            }
+        ];
+
+        // Estado de autenticación
+        let currentUser = null;
+
+        // Funciones de autenticación
+        function openAuthModal() {
+            document.getElementById('authOverlay').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('authModal').classList.add('active');
+            }, 10);
+            switchAuthTab('login');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('authOverlay').style.display = 'none';
+            }, 300);
+        }
+
+        function switchAuthTab(tab) {
+            // Cambiar pestañas activas
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+                // Limpiar errores
+                clearErrors('login');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+                // Limpiar errores
+                clearErrors('register');
+            }
+        }
+
+        function clearErrors(formType) {
+            if (formType === 'login') {
+                document.getElementById('loginError').style.display = 'none';
+                document.getElementById('loginEmailError').style.display = 'none';
+                document.getElementById('loginPasswordError').style.display = 'none';
+            } else {
+                document.getElementById('registerError').style.display = 'none';
+                document.getElementById('registerNameError').style.display = 'none';
+                document.getElementById('registerEmailError').style.display = 'none';
+                document.getElementById('registerPhoneError').style.display = 'none';
+                document.getElementById('registerPasswordError').style.display = 'none';
+                document.getElementById('registerConfirmPasswordError').style.display = 'none';
+                document.getElementById('registerSuccess').style.display = 'none';
+            }
+        }
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function login(event) {
+            event.preventDefault();
+            clearErrors('login');
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Validaciones
+            if (!email) {
+                showError('loginEmailError', 'El correo electrónico es requerido');
+                return;
+            }
+            
+            if (!password) {
+                showError('loginPasswordError', 'La contraseña es requerida');
+                return;
+            }
+            
+            // Buscar usuario
+            const user = exampleUsers.find(u => u.email === email);
+            
+            if (!user) {
+                showError('loginError', 'Usuario no encontrado');
+                return;
+            }
+            
+            if (user.password !== password) {
+                showError('loginError', 'Contraseña incorrecta');
+                return;
+            }
+            
+            // Iniciar sesión exitosamente
+            currentUser = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone
+            };
+            
+            // Guardar en localStorage
+            localStorage.setItem('fruteriaUser', JSON.stringify(currentUser));
+            
+            // Actualizar interfaz
+            updateUserInterface();
+            
+            // Mostrar mensaje de bienvenida
+            showConfirmationMessage(`¡Bienvenido, ${user.name}!`);
+            
+            // Cerrar modal
+            closeAuthModal();
+            
+            // Limpiar formulario
+            event.target.reset();
+        }
+
+        function register(event) {
+            event.preventDefault();
+            clearErrors('register');
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // Validaciones
+            if (!name) {
+                showError('registerNameError', 'El nombre es requerido');
+                return;
+            }
+            
+            if (!email) {
+                showError('registerEmailError', 'El correo electrónico es requerido');
+                return;
+            }
+            
+            // Validar formato de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('registerEmailError', 'El correo electrónico no es válido');
+                return;
+            }
+            
+            // Verificar si el email ya existe
+            if (exampleUsers.some(u => u.email === email)) {
+                showError('registerEmailError', 'Este correo ya está registrado');
+                return;
+            }
+            
+            if (!password) {
+                showError('registerPasswordError', 'La contraseña es requerida');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('registerPasswordError', 'La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('registerConfirmPasswordError', 'Las contraseñas no coinciden');
+                return;
+            }
+            
+            // Crear nuevo usuario
+            const newUser = {
+                id: exampleUsers.length + 1,
+                name: name,
+                email: email,
+                phone: phone,
+                password: password
+            };
+            
+            // En un sistema real, aquí enviaríamos los datos al servidor
+            // Por ahora, solo agregamos al array de ejemplo
+            exampleUsers.push(newUser);
+            
+            // Mostrar mensaje de éxito
+            const successElement = document.getElementById('registerSuccess');
+            successElement.textContent = '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.';
+            successElement.style.display = 'block';
+            
+            // Cambiar a pestaña de login después de 2 segundos
+            setTimeout(() => {
+                switchAuthTab('login');
+                document.getElementById('loginEmail').value = email;
+            }, 2000);
+            
+            // Limpiar formulario
+            event.target.reset();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('fruteriaUser');
+            updateUserInterface();
+            showConfirmationMessage('Sesión cerrada exitosamente');
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function updateUserInterface() {
+            const userMenu = document.getElementById('userMenu');
+            const loginBtnContainer = document.getElementById('loginBtnContainer');
+            const userNameElement = document.getElementById('userName');
+            
+            if (currentUser) {
+                // Mostrar menú de usuario
+                userMenu.style.display = 'block';
+                loginBtnContainer.style.display = 'none';
+                userNameElement.textContent = currentUser.name.split(' ')[0]; // Mostrar solo el primer nombre
+                
+                // Cerrar dropdown si está abierto
+                document.getElementById('userDropdown').style.display = 'none';
+            } else {
+                // Mostrar botón de login
+                userMenu.style.display = 'none';
+                loginBtnContainer.style.display = 'block';
+            }
+        }
+
+        function checkAuthOnLoad() {
+            const savedUser = localStorage.getItem('fruteriaUser');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    updateUserInterface();
+                } catch (e) {
+                    console.error('Error al cargar usuario:', e);
+                    localStorage.removeItem('fruteriaUser');
+                }
+            }
+        }
+
         // ===== CARRUSEL CORREGIDO Y FUNCIONAL =====
         let currentSlideIndex = 0;
         let carouselInterval;
@@ -1115,6 +1668,13 @@
         }
         
         function addToCart() {
+            // Verificar si el usuario ha iniciado sesión
+            if (!currentUser) {
+                showConfirmationMessage('Debes iniciar sesión para agregar productos al carrito');
+                openAuthModal();
+                return;
+            }
+            
             // Obtener carrito actual de localStorage
             const carritoActual = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
             
@@ -1250,6 +1810,9 @@
         window.onclick = function(event) {
             const modal = document.getElementById('productModal');
             const helpModal = document.getElementById('helpModal');
+            const authOverlay = document.getElementById('authOverlay');
+            const userDropdown = document.getElementById('userDropdown');
+            const userMenu = document.getElementById('userMenu');
             
             if (event.target === modal) {
                 closeModal();
@@ -1257,6 +1820,15 @@
             
             if (event.target === helpModal) {
                 closeHelpModal();
+            }
+            
+            if (event.target === authOverlay) {
+                closeAuthModal();
+            }
+            
+            // Cerrar dropdown de usuario si se hace clic fuera
+            if (userDropdown && userMenu && !userMenu.contains(event.target)) {
+                userDropdown.style.display = 'none';
             }
         }
 
@@ -1272,6 +1844,9 @@
 
         // Inicializar cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticación al cargar
+            checkAuthOnLoad();
+            
             // Inicializar el carrusel
             initCarousel();
             
@@ -1302,6 +1877,9 @@
         window.addEventListener('storage', function(e) {
             if (e.key === 'carritoFruteria') {
                 actualizarContadorCarrito();
+            }
+            if (e.key === 'fruteriaUser') {
+                checkAuthOnLoad();
             }
         });
         
