@@ -139,6 +139,43 @@
             display: none;
         }
 
+        /* Estilos para CAPTCHA */
+        .captcha-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .captcha-question {
+            font-size: 18px;
+            font-weight: bold;
+            background: #2e7d32;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .captcha-refresh {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #2e7d32;
+            transition: transform 0.2s;
+        }
+        .captcha-refresh:hover {
+            transform: rotate(15deg);
+        }
+        .captcha-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
         .user-menu {
             position: relative;
             display: none;
@@ -558,7 +595,7 @@
             padding: 10px;
             background-color: #4CAF50;
             color: white;
-            border: null;
+            border: none;
             border-radius: 4px;
             font-size: 14px;
             cursor: pointer;
@@ -766,6 +803,51 @@
             text-align: center;
             color: #666;
         }
+
+        /* ===== ESTILOS PARA SCROLL ===== */
+        header {
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-scrolled {
+            background-color: #1b5e20 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #2e7d32;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border: none;
+        }
+        
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background-color: #1b5e20;
+            transform: translateY(-3px);
+        }
     </style>
 </head>
 <body>
@@ -790,6 +872,16 @@
                         <label for="loginPassword">Contraseña</label>
                         <input type="password" id="loginPassword" placeholder="Tu contraseña" required>
                         <div id="loginPasswordError" class="auth-error"></div>
+                    </div>
+                    <!-- CAPTCHA para login -->
+                    <div class="form-group">
+                        <label>Verificación de seguridad</label>
+                        <div class="captcha-container" id="loginCaptchaContainer">
+                            <span class="captcha-question" id="loginCaptchaQuestion">?</span>
+                            <button type="button" class="captcha-refresh" onclick="refreshLoginCaptcha()"><i class="fas fa-sync-alt"></i></button>
+                            <input type="text" id="loginCaptchaInput" class="captcha-input" placeholder="Resultado" autocomplete="off">
+                        </div>
+                        <div id="loginCaptchaError" class="auth-error"></div>
                     </div>
                     <div id="loginError" class="auth-error"></div>
                     <button type="submit" class="auth-btn">Iniciar Sesión</button>
@@ -822,6 +914,16 @@
                         <label for="registerConfirmPassword">Confirmar Contraseña</label>
                         <input type="password" id="registerConfirmPassword" placeholder="Repite tu contraseña" required>
                         <div id="registerConfirmPasswordError" class="auth-error"></div>
+                    </div>
+                    <!-- CAPTCHA para registro -->
+                    <div class="form-group">
+                        <label>Verificación de seguridad</label>
+                        <div class="captcha-container" id="registerCaptchaContainer">
+                            <span class="captcha-question" id="registerCaptchaQuestion">?</span>
+                            <button type="button" class="captcha-refresh" onclick="refreshRegisterCaptcha()"><i class="fas fa-sync-alt"></i></button>
+                            <input type="text" id="registerCaptchaInput" class="captcha-input" placeholder="Resultado" autocomplete="off">
+                        </div>
+                        <div id="registerCaptchaError" class="auth-error"></div>
                     </div>
                     <div id="registerError" class="auth-error"></div>
                     <div id="registerSuccess" class="auth-success"></div>
@@ -893,61 +995,19 @@
     </header>
 
     <!-- Contenido principal (resto del código permanece igual) -->
-    <!-- Carrusel de imágenes - VERSIÓN FINAL CORREGIDA -->
+    <!-- Carrusel de imágenes -->
     <section class="carousel-section">
         <div class="carousel-container" id="carouselContainer">
-            <!-- Áreas de navegación por hover -->
             <div class="carousel-hover-nav prev-hover" onmouseenter="handleHoverNavigation('prev')"></div>
             <div class="carousel-hover-nav next-hover" onmouseenter="handleHoverNavigation('next')"></div>
-            
-            <!-- Slides del carrusel -->
             <div class="carousel-slides" id="carouselSlides">
-                <!-- Slide 1 -->
-                <div class="carousel-slide">
-                    <img src="imagenes/Tomates.png" alt="Tomates Frescos">
-                    <div class="carousel-caption">
-                        <h3>Verduras Orgánicas</h3>
-                        <p>Verduras frescas directas del campo</p>
-                    </div>
-                </div>
-                
-                <!-- Slide 2 -->
-                <div class="carousel-slide">
-                    <img src="imagenes/Manzana.png" alt="Frutas Frescas">
-                    <div class="carousel-caption">
-                        <h3>Frutas Frescas</h3>
-                        <p>La mejor selección de frutas de temporada</p>
-                    </div>
-                </div>
-                
-                <!-- Slide 3 -->
-                <div class="carousel-slide">
-                    <img src="imagenes/Pollo.png" alt="Carnes de Calidad">
-                    <div class="carousel-caption">
-                        <h3>Carnes de Calidad</h3>
-                        <p>Cortes seleccionados para tu familia</p>
-                    </div>
-                </div>
-                
-                <!-- Slide 4 -->
-                <div class="carousel-slide">
-                    <img src="imagenes/Tornachiles.png" alt="Tornachiles Artesanales">
-                    <div class="carousel-caption">
-                        <h3>Tornachiles Artesanales</h3>
-                        <p>El sabor tradicional en cada botella</p>
-                    </div>
-                </div>
+                <div class="carousel-slide"><img src="imagenes/Tomates.png" alt="Tomates Frescos"><div class="carousel-caption"><h3>Verduras Orgánicas</h3><p>Verduras frescas directas del campo</p></div></div>
+                <div class="carousel-slide"><img src="imagenes/Manzana.png" alt="Frutas Frescas"><div class="carousel-caption"><h3>Frutas Frescas</h3><p>La mejor selección de frutas de temporada</p></div></div>
+                <div class="carousel-slide"><img src="imagenes/Pollo.png" alt="Carnes de Calidad"><div class="carousel-caption"><h3>Carnes de Calidad</h3><p>Cortes seleccionados para tu familia</p></div></div>
+                <div class="carousel-slide"><img src="imagenes/Tornachiles.png" alt="Tornachiles Artesanales"><div class="carousel-caption"><h3>Tornachiles Artesanales</h3><p>El sabor tradicional en cada botella</p></div></div>
             </div>
-            
-            <!-- Botones de navegación -->
-            <button class="carousel-btn prev" onclick="changeSlide('prev')">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="carousel-btn next" onclick="changeSlide('next')">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            
-            <!-- Indicadores -->
+            <button class="carousel-btn prev" onclick="changeSlide('prev')"><i class="fas fa-chevron-left"></i></button>
+            <button class="carousel-btn next" onclick="changeSlide('next')"><i class="fas fa-chevron-right"></i></button>
             <div class="carousel-indicators" id="carouselIndicators">
                 <button class="carousel-indicator active" onclick="goToSlide(0)"></button>
                 <button class="carousel-indicator" onclick="goToSlide(1)"></button>
@@ -961,182 +1021,48 @@
     <section class="products-section" id="productos">
         <div class="container">
             <h2 class="section-title">Nuestros productos mas vendidos!</h2>
-            
             <!-- Frutas -->
             <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-category">Frutas</div>
-                    <img src="imagenes/Manzana.png" alt="Manzana Roja" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Manzanas Rojas</h3>
-                        <p class="product-price">$40.00 pesos /kg</p>
-                        <p class="product-description">Manzanas rojas dulces.</p>
-                        <button class="view-product-btn" onclick="openModal('Manzanas Rojas', 40.00, 'kg', 'imagenes/Manzana.png', 'Frutas')">Ver Producto</button>
-                    </div>
-                </div>
-                
-                <div class="product-card">
-                    <div class="product-category">Frutas</div>
-                    <img src="imagenes/Platanos.png" alt="Plátanos" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Plátanos</h3>
-                        <p class="product-price">$20.00 pesos /kg</p>
-                        <p class="product-description">Plátanos maduros y dulces.</p>
-                        <button class="view-product-btn" onclick="openModal('Plátanos', 20.00, 'kg', 'imagenes/Platanos.png', 'Frutas')">Ver Producto</button>
-                    </div>
-                </div>
-                
-                <div class="product-card">
-                    <div class="product-category">Frutas</div>
-                    <img src="imagenes/Manzana verde.png" alt="Manzana Verde" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Manzana Verde</h3>
-                        <p class="product-price">$35.00 pesos /kg</p>
-                        <p class="product-description">Manzana Verde para su fruta</p>
-                        <button class="view-product-btn" onclick="openModal('Manzana Verde', 35.00, 'kg', 'imagenes/Manzana verde.png', 'Frutas')">Ver Producto</button>
-                    </div>
-                </div>
-                
-                <div class="product-card">
-                    <div class="product-category">Frutas</div>
-                    <img src="imagenes/Papaya.png" alt="Papaya" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Papaya</h3>
-                        <p class="product-price">$37.00 pesos /kg</p>
-                        <p class="product-description">Papaya fresca y sabrosa.</p>
-                        <button class="view-product-btn" onclick="openModal('Papaya', 37.00, 'kg', 'imagenes/Papaya.png', 'Frutas')">Ver Producto</button>
-                    </div>
-                </div>
+                <div class="product-card"><div class="product-category">Frutas</div><img src="imagenes/Manzana.png" alt="Manzana Roja" class="product-image"><div class="product-info"><h3 class="product-name">Manzanas Rojas</h3><p class="product-price">$40.00 pesos /kg</p><p class="product-description">Manzanas rojas dulces.</p><button class="view-product-btn" onclick="openModal('Manzanas Rojas', 40.00, 'kg', 'imagenes/Manzana.png', 'Frutas')">Ver Producto</button></div></div>
+                <div class="product-card"><div class="product-category">Frutas</div><img src="imagenes/Platanos.png" alt="Plátanos" class="product-image"><div class="product-info"><h3 class="product-name">Plátanos</h3><p class="product-price">$20.00 pesos /kg</p><p class="product-description">Plátanos maduros y dulces.</p><button class="view-product-btn" onclick="openModal('Plátanos', 20.00, 'kg', 'imagenes/Platanos.png', 'Frutas')">Ver Producto</button></div></div>
+                <div class="product-card"><div class="product-category">Frutas</div><img src="imagenes/Manzana verde.png" alt="Manzana Verde" class="product-image"><div class="product-info"><h3 class="product-name">Manzana Verde</h3><p class="product-price">$35.00 pesos /kg</p><p class="product-description">Manzana Verde para su fruta</p><button class="view-product-btn" onclick="openModal('Manzana Verde', 35.00, 'kg', 'imagenes/Manzana verde.png', 'Frutas')">Ver Producto</button></div></div>
+                <div class="product-card"><div class="product-category">Frutas</div><img src="imagenes/Papaya.png" alt="Papaya" class="product-image"><div class="product-info"><h3 class="product-name">Papaya</h3><p class="product-price">$37.00 pesos /kg</p><p class="product-description">Papaya fresca y sabrosa.</p><button class="view-product-btn" onclick="openModal('Papaya', 37.00, 'kg', 'imagenes/Papaya.png', 'Frutas')">Ver Producto</button></div></div>
             </div>
             <br>
             <!-- Verduras -->
-            <h3 id="verduras" class="category-title"></h3>
             <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-category">Verduras</div>
-                    <img src="imagenes/Tomates.png" alt="Tomates" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Tomate Rojo</h3>
-                        <p class="product-price">$27.00 pesos /kg</p>
-                        <p class="product-description">Tomates maduros y sabrosos.</p>
-                        <button class="view-product-btn" onclick="openModal('Tomate Rojo', 27.00, 'kg', 'imagenes/Tomates.png', 'Verduras')">Ver Producto</button>
-                    </div>
-                </div>
-                
-                
-                <div class="product-card">
-                    <div class="product-category">Verduras</div>
-                    <img src="imagenes/Cebolla.png" alt="Cebollas" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Cebollas</h3>
-                        <p class="product-price">$24.00 pesos /kg</p>
-                        <p class="product-description">Cebollas ideales para guisos.</p>
-                        <button class="view-product-btn" onclick="openModal('Cebollas', 24.00, 'kg', 'imagenes/Cebolla.png', 'Verduras')">Ver Producto</button>
-                    </div>
-                </div>
-                
-
-                <div class="product-card">
-                    <div class="product-category">Verduras</div>
-                    <img src="imagenes/papa.png" alt="Papas" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Papas</h3>
-                        <p class="product-price">$20.00 pesos /kg</p>
-                        <p class="product-description">Papa Lavada.</p>
-                        <button class="view-product-btn" onclick="openModal('Papas', 20.00, 'kg', 'imagenes/papa.png', 'Verduras')">Ver Producto</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-category">Verduras</div>
-                    <img src="imagenes/Chile Serranos.png" alt="Chile Serranos" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Chile Serranos</h3>
-                        <p class="product-price">$55.00 pesos /kg</p>
-                        <p class="product-description">Chile Serranos.</p>
-                        <button class="view-product-btn" onclick="openModal('Chile Serranos', 55.00, 'kg', 'imagenes/Chile Serranos.png', 'Verduras')">Ver Producto</button>
-                    </div>
-                </div>
+                <div class="product-card"><div class="product-category">Verduras</div><img src="imagenes/Tomates.png" alt="Tomates" class="product-image"><div class="product-info"><h3 class="product-name">Tomate Rojo</h3><p class="product-price">$27.00 pesos /kg</p><p class="product-description">Tomates maduros y sabrosos.</p><button class="view-product-btn" onclick="openModal('Tomate Rojo', 27.00, 'kg', 'imagenes/Tomates.png', 'Verduras')">Ver Producto</button></div></div>
+                <div class="product-card"><div class="product-category">Verduras</div><img src="imagenes/Cebolla.png" alt="Cebollas" class="product-image"><div class="product-info"><h3 class="product-name">Cebollas</h3><p class="product-price">$24.00 pesos /kg</p><p class="product-description">Cebollas ideales para guisos.</p><button class="view-product-btn" onclick="openModal('Cebollas', 24.00, 'kg', 'imagenes/Cebolla.png', 'Verduras')">Ver Producto</button></div></div>
+                <div class="product-card"><div class="product-category">Verduras</div><img src="imagenes/papa.png" alt="Papas" class="product-image"><div class="product-info"><h3 class="product-name">Papas</h3><p class="product-price">$20.00 pesos /kg</p><p class="product-description">Papa Lavada.</p><button class="view-product-btn" onclick="openModal('Papas', 20.00, 'kg', 'imagenes/papa.png', 'Verduras')">Ver Producto</button></div></div>
+                <div class="product-card"><div class="product-category">Verduras</div><img src="imagenes/Chile Serranos.png" alt="Chile Serranos" class="product-image"><div class="product-info"><h3 class="product-name">Chile Serranos</h3><p class="product-price">$55.00 pesos /kg</p><p class="product-description">Chile Serranos.</p><button class="view-product-btn" onclick="openModal('Chile Serranos', 55.00, 'kg', 'imagenes/Chile Serranos.png', 'Verduras')">Ver Producto</button></div></div>
             </div>
             <br>
             <!-- Carne -->
-            <h3 id="carne" class="category-title"></h3>
             <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-category">Carne</div>
-                    <img src="imagenes/Pollo.png" alt="Pollo" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Pollo</h3>
-                        <p class="product-price">$45.00 pesos /kg</p>
-                        <p class="product-description">Pollo fresco.</p>
-                        <button class="view-product-btn" onclick="openModal('Pollo', 45.00, 'kg', 'imagenes/Pollo.png', 'Carne')">Ver Producto</button>
-                    </div>
-                </div>
-
-
-                <div class="product-card">
-                    <div class="product-category">Carne</div>
-                    <img src="imagenes/Carne Molida.png" alt="Carne Molida" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Carne Molida</h3>
-                        <p class="product-price">$200.00 pesos /kg</p>
-                        <p class="product-description">Carne molida de res.</p>
-                        <button class="view-product-btn" onclick="openModal('Carne Molida', 200.00, 'kg', 'imagenes/Carne Molida.png', 'Carne')">Ver Producto</button>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-category">Carne</div>
-                    <img src="imagenes/Queso.png" alt="Queso" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Queso</h3>
-                        <p class="product-price">$160.00 pesos /kg</p>
-                        <p class="product-description">Queso para todas sus comidas.</p>
-                        <button class="view-product-btn" onclick="openModal('Queso', 160.00, 'kg', 'imagenes/Queso.png', 'Carne')">Ver Producto</button>
-                    </div>
-                </div>
+                <div class="product-card"><div class="product-category">Carne</div><img src="imagenes/Pollo.png" alt="Pollo" class="product-image"><div class="product-info"><h3 class="product-name">Pollo</h3><p class="product-price">$45.00 pesos /kg</p><p class="product-description">Pollo fresco.</p><button class="view-product-btn" onclick="openModal('Pollo', 45.00, 'kg', 'imagenes/Pollo.png', 'Carne')">Ver Producto</button></div></div>
+                <div class="product-card"><div class="product-category">Carne</div><img src="imagenes/Carne Molida.png" alt="Carne Molida" class="product-image"><div class="product-info"><h3 class="product-name">Carne Molida</h3><p class="product-price">$200.00 pesos /kg</p><p class="product-description">Carne molida de res.</p><button class="view-product-btn" onclick="openModal('Carne Molida', 200.00, 'kg', 'imagenes/Carne Molida.png', 'Carne')">Ver Producto</button></div></div>
+                <div class="product-card"><div class="product-category">Carne</div><img src="imagenes/Queso.png" alt="Queso" class="product-image"><div class="product-info"><h3 class="product-name">Queso</h3><p class="product-price">$160.00 pesos /kg</p><p class="product-description">Queso para todas sus comidas.</p><button class="view-product-btn" onclick="openModal('Queso', 160.00, 'kg', 'imagenes/Queso.png', 'Carne')">Ver Producto</button></div></div>
             </div>
             <br>
             <!-- Tornachiles -->
-            <h3 id="tornachiles" class="category-title"></h3>
             <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-category">Tornachiles</div>
-                    <img src="imagenes/Tornachiles.png" alt="Tornachiles Rojos" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">Tornachiles</h3>
-                        <p class="product-price">$35.00 pesos /botella</p>
-                        <p class="product-description">Tornachiles en botella, ideales para acompañar con sus comidas</p>
-                        <button class="view-product-btn" onclick="openModal('Tornachiles', 35.00, 'botella', 'imagenes/Tornachiles.png', 'Tornachiles')">Ver Producto</button>
-                    </div>
-                </div>
+                <div class="product-card"><div class="product-category">Tornachiles</div><img src="imagenes/Tornachiles.png" alt="Tornachiles Rojos" class="product-image"><div class="product-info"><h3 class="product-name">Tornachiles</h3><p class="product-price">$35.00 pesos /botella</p><p class="product-description">Tornachiles en botella, ideales para acompañar con sus comidas</p><button class="view-product-btn" onclick="openModal('Tornachiles', 35.00, 'botella', 'imagenes/Tornachiles.png', 'Tornachiles')">Ver Producto</button></div></div>
             </div>
         </div>
     </section>
 
     <!-- Botón flotante para ver carrito -->
-    <a href="carrito.html" class="view-cart-btn">
-        <i class="fas fa-shopping-basket"></i>
-        <span class="cart-count" id="cartCount">0</span>
-    </a>
+    <a href="carrito.html" class="view-cart-btn"><i class="fas fa-shopping-basket"></i><span class="cart-count" id="cartCount">0</span></a>
+
+    <!-- Botón para volver arriba -->
+    <div id="backToTop" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fas fa-arrow-up"></i></div>
 
     <!-- Modal de producto -->
     <div id="productModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalProductName">Producto</h2>
-                <span class="close-btn" onclick="closeModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p class="modal-price" id="modalProductPrice">$0.00</p>
-                <p class="modal-description" id="modalProductDescription">Descripción del producto</p>
-                
-                <div class="quantity-selector">
-                    <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                    <span class="quantity-display" id="quantityDisplay">1</span>
-                    <button class="quantity-btn" onclick="increaseQuantity()">+</button>
-                </div>
-                
+            <div class="modal-header"><h2 class="modal-title" id="modalProductName">Producto</h2><span class="close-btn" onclick="closeModal()">&times;</span></div>
+            <div class="modal-body"><p class="modal-price" id="modalProductPrice">$0.00</p><p class="modal-description" id="modalProductDescription">Descripción del producto</p>
+                <div class="quantity-selector"><button class="quantity-btn" onclick="decreaseQuantity()">-</button><span class="quantity-display" id="quantityDisplay">1</span><button class="quantity-btn" onclick="increaseQuantity()">+</button></div>
                 <button class="add-to-cart-btn" onclick="addToCart()">Añadir al Carrito</button>
             </div>
         </div>
@@ -1145,58 +1071,14 @@
     <!-- Modal de ayuda -->
     <div id="helpModal" class="help-modal">
         <div class="help-modal-content">
-            <div class="help-modal-header">
-                <h2 class="help-modal-title">Cómo hacer un pedido</h2>
-                <span class="help-close-btn" onclick="closeHelpModal()">&times;</span>
-            </div>
+            <div class="help-modal-header"><h2 class="help-modal-title">Cómo hacer un pedido</h2><span class="help-close-btn" onclick="closeHelpModal()">&times;</span></div>
             <div class="help-modal-body">
-                <div class="help-step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <div class="step-title">Explora nuestros productos</div>
-                        <p>Navega por nuestras categorías de frutas, verduras, carnes y tornachiles para ver todos los productos disponibles.</p>
-                    </div>
-                </div>
-                
-                <div class="help-step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <div class="step-title">Selecciona un producto</div>
-                        <p>Haz clic en el botón "Ver Producto" de cualquier artículo que te interese para ver más detalles.</p>
-                    </div>
-                </div>
-                
-                <div class="help-step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <div class="step-title">Selecciona la cantidad</div>
-                        <p>En la ventana emergente, usa los botones + y - para seleccionar la cantidad deseada. Para frutas, verduras y carnes puedes seleccionar medios kilos.</p>
-                    </div>
-                </div>
-                
-                <div class="help-step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <div class="step-title">Añade al carrito</div>
-                        <p>Haz clic en "Añadir al Carrito" para agregar el producto con la cantidad seleccionada a tu pedido.</p>
-                    </div>
-                </div>
-                
-                <div class="help-step">
-                    <div class="step-number">5</div>
-                    <div class="step-content">
-                        <div class="step-title">Revisa y finaliza tu pedido</div>
-                        <p>Haz clic en el botón de carrito en la esquina inferior derecha para ver todos los productos seleccionados y completar tu pedido.</p>
-                    </div>
-                </div>
-                
-                <div class="help-step">
-                    <div class="step-number">6</div>
-                    <div class="step-content">
-                        <div class="step-title">Confirma tu pedido</div>
-                        <p>En la página de pedidos, revisa los productos, cantidades y precios. Si todo está correcto, confirma tu pedido para que lo preparemos.</p>
-                    </div>
-                </div>
+                <div class="help-step"><div class="step-number">1</div><div class="step-content"><div class="step-title">Explora nuestros productos</div><p>Navega por nuestras categorías de frutas, verduras, carnes y tornachiles para ver todos los productos disponibles.</p></div></div>
+                <div class="help-step"><div class="step-number">2</div><div class="step-content"><div class="step-title">Selecciona un producto</div><p>Haz clic en el botón "Ver Producto" de cualquier artículo que te interese para ver más detalles.</p></div></div>
+                <div class="help-step"><div class="step-number">3</div><div class="step-content"><div class="step-title">Selecciona la cantidad</div><p>En la ventana emergente, usa los botones + y - para seleccionar la cantidad deseada. Para frutas, verduras y carnes puedes seleccionar medios kilos.</p></div></div>
+                <div class="help-step"><div class="step-number">4</div><div class="step-content"><div class="step-title">Añade al carrito</div><p>Haz clic en "Añadir al Carrito" para agregar el producto con la cantidad seleccionada a tu pedido.</p></div></div>
+                <div class="help-step"><div class="step-number">5</div><div class="step-content"><div class="step-title">Revisa y finaliza tu pedido</div><p>Haz clic en el botón de carrito en la esquina inferior derecha para ver todos los productos seleccionados y completar tu pedido.</p></div></div>
+                <div class="help-step"><div class="step-number">6</div><div class="step-content"><div class="step-title">Confirma tu pedido</div><p>En la página de pedidos, revisa los productos, cantidades y precios. Si todo está correcto, confirma tu pedido para que lo preparemos.</p></div></div>
             </div>
         </div>
     </div>
@@ -1205,80 +1087,51 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
-                    <img src="imagenes\Fruteria.png" width="180" height="180">
-                </div>
-                <div class="footer-section">
-                    <h3>Contacto</h3>
-                    <p><i class="fas fa-phone" style="color: #FCFC99;"></i> +52 1 675 871 0267</p>
-                    <p><i class="fas fa-map-marker-alt" style="color: #FCFC99;"></i> Cieneguilla, Rojas, La Ochoa, Pilares</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Horario</h3>
-                    <p>Martes a Viernes: 8:00 - 20:00</p>
-                    <p>Domingos: 10:00 - 14:00</p>
-                </div>
+                <div class="footer-section"><img src="imagenes\Fruteria.png" width="180" height="180"></div>
+                <div class="footer-section"><h3>Contacto</h3><p><i class="fas fa-phone" style="color: #FCFC99;"></i> +52 1 675 871 0267</p><p><i class="fas fa-map-marker-alt" style="color: #FCFC99;"></i> Cieneguilla, Rojas, La Ochoa, Pilares</p></div>
+                <div class="footer-section"><h3>Horario</h3><p>Martes a Viernes: 8:00 - 20:00</p><p>Domingos: 10:00 - 14:00</p></div>
             </div>
-            <div class="copyright">
-                <p>&copy; 2024 Frutería el Güero. Todos los derechos reservados.</p>
-            </div>
+            <div class="copyright"><p>&copy; 2024 Frutería el Güero. Todos los derechos reservados.</p></div>
         </div>
     </footer>
 
     <script>
         // ===== SISTEMA DE AUTENTICACIÓN =====
-        // Usuarios de ejemplo (en un sistema real, esto estaría en el servidor)
         const exampleUsers = [
-            {
-                id: 1,
-                name: "Juan Pérez",
-                email: "juan@ejemplo.com",
-                phone: "5566778899",
-                password: "password123"
-            },
-            {
-                id: 2,
-                name: "María García",
-                email: "maria@ejemplo.com",
-                phone: "5512345678",
-                password: "clave456"
-            }
+            { id: 1, name: "Juan Pérez", email: "juan@ejemplo.com", phone: "5566778899", password: "password123" },
+            { id: 2, name: "María García", email: "maria@ejemplo.com", phone: "5512345678", password: "clave456" }
         ];
-
-        // Estado de autenticación
         let currentUser = null;
+
+        // Variables para CAPTCHA
+        let loginCaptchaAnswer = null;
+        let registerCaptchaAnswer = null;
 
         // Funciones de autenticación
         function openAuthModal() {
             document.getElementById('authOverlay').style.display = 'flex';
-            setTimeout(() => {
-                document.getElementById('authModal').classList.add('active');
-            }, 10);
+            setTimeout(() => document.getElementById('authModal').classList.add('active'), 10);
             switchAuthTab('login');
         }
 
         function closeAuthModal() {
             document.getElementById('authModal').classList.remove('active');
-            setTimeout(() => {
-                document.getElementById('authOverlay').style.display = 'none';
-            }, 300);
+            setTimeout(() => document.getElementById('authOverlay').style.display = 'none', 300);
         }
 
         function switchAuthTab(tab) {
-            // Cambiar pestañas activas
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            
             if (tab === 'login') {
                 document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
                 document.getElementById('loginForm').classList.add('active');
-                // Limpiar errores
                 clearErrors('login');
+                refreshLoginCaptcha(); // Generar CAPTCHA al mostrar login
             } else {
                 document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
                 document.getElementById('registerForm').classList.add('active');
-                // Limpiar errores
                 clearErrors('register');
+                refreshRegisterCaptcha(); // Generar CAPTCHA al mostrar registro
             }
         }
 
@@ -1287,6 +1140,7 @@
                 document.getElementById('loginError').style.display = 'none';
                 document.getElementById('loginEmailError').style.display = 'none';
                 document.getElementById('loginPasswordError').style.display = 'none';
+                document.getElementById('loginCaptchaError').style.display = 'none';
             } else {
                 document.getElementById('registerError').style.display = 'none';
                 document.getElementById('registerNameError').style.display = 'none';
@@ -1294,6 +1148,7 @@
                 document.getElementById('registerPhoneError').style.display = 'none';
                 document.getElementById('registerPasswordError').style.display = 'none';
                 document.getElementById('registerConfirmPasswordError').style.display = 'none';
+                document.getElementById('registerCaptchaError').style.display = 'none';
                 document.getElementById('registerSuccess').style.display = 'none';
             }
         }
@@ -1304,135 +1159,88 @@
             element.style.display = 'block';
         }
 
+        // Generar CAPTCHA para login
+        function generateCaptcha() {
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const answer = num1 + num2;
+            return { question: `${num1} + ${num2}`, answer: answer };
+        }
+
+        function refreshLoginCaptcha() {
+            const captcha = generateCaptcha();
+            document.getElementById('loginCaptchaQuestion').textContent = captcha.question;
+            loginCaptchaAnswer = captcha.answer;
+            document.getElementById('loginCaptchaInput').value = '';
+            document.getElementById('loginCaptchaError').style.display = 'none';
+        }
+
+        function refreshRegisterCaptcha() {
+            const captcha = generateCaptcha();
+            document.getElementById('registerCaptchaQuestion').textContent = captcha.question;
+            registerCaptchaAnswer = captcha.answer;
+            document.getElementById('registerCaptchaInput').value = '';
+            document.getElementById('registerCaptchaError').style.display = 'none';
+        }
+
+        // Validar CAPTCHA
+        function validateCaptcha(inputValue, expectedAnswer, errorElementId) {
+            if (parseInt(inputValue) !== expectedAnswer) {
+                showError(errorElementId, 'Respuesta incorrecta. Intenta de nuevo.');
+                return false;
+            }
+            return true;
+        }
+
         function login(event) {
             event.preventDefault();
             clearErrors('login');
-            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            
-            // Validaciones
-            if (!email) {
-                showError('loginEmailError', 'El correo electrónico es requerido');
-                return;
-            }
-            
-            if (!password) {
-                showError('loginPasswordError', 'La contraseña es requerida');
-                return;
-            }
-            
-            // Buscar usuario
+            const captchaInput = document.getElementById('loginCaptchaInput').value;
+
+            if (!email) { showError('loginEmailError', 'El correo electrónico es requerido'); return; }
+            if (!password) { showError('loginPasswordError', 'La contraseña es requerida'); return; }
+            if (!validateCaptcha(captchaInput, loginCaptchaAnswer, 'loginCaptchaError')) return;
+
             const user = exampleUsers.find(u => u.email === email);
-            
-            if (!user) {
-                showError('loginError', 'Usuario no encontrado');
-                return;
-            }
-            
-            if (user.password !== password) {
-                showError('loginError', 'Contraseña incorrecta');
-                return;
-            }
-            
-            // Iniciar sesión exitosamente
-            currentUser = {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone
-            };
-            
-            // Guardar en localStorage
+            if (!user) { showError('loginError', 'Usuario no encontrado'); return; }
+            if (user.password !== password) { showError('loginError', 'Contraseña incorrecta'); return; }
+
+            currentUser = { id: user.id, name: user.name, email: user.email, phone: user.phone };
             localStorage.setItem('fruteriaUser', JSON.stringify(currentUser));
-            
-            // Actualizar interfaz
             updateUserInterface();
-            
-            // Mostrar mensaje de bienvenida
             showConfirmationMessage(`¡Bienvenido, ${user.name}!`);
-            
-            // Cerrar modal
             closeAuthModal();
-            
-            // Limpiar formulario
             event.target.reset();
         }
 
         function register(event) {
             event.preventDefault();
             clearErrors('register');
-            
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value;
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
-            
-            // Validaciones
-            if (!name) {
-                showError('registerNameError', 'El nombre es requerido');
-                return;
-            }
-            
-            if (!email) {
-                showError('registerEmailError', 'El correo electrónico es requerido');
-                return;
-            }
-            
-            // Validar formato de email
+            const captchaInput = document.getElementById('registerCaptchaInput').value;
+
+            if (!name) { showError('registerNameError', 'El nombre es requerido'); return; }
+            if (!email) { showError('registerEmailError', 'El correo electrónico es requerido'); return; }
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showError('registerEmailError', 'El correo electrónico no es válido');
-                return;
-            }
-            
-            // Verificar si el email ya existe
-            if (exampleUsers.some(u => u.email === email)) {
-                showError('registerEmailError', 'Este correo ya está registrado');
-                return;
-            }
-            
-            if (!password) {
-                showError('registerPasswordError', 'La contraseña es requerida');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showError('registerPasswordError', 'La contraseña debe tener al menos 6 caracteres');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showError('registerConfirmPasswordError', 'Las contraseñas no coinciden');
-                return;
-            }
-            
-            // Crear nuevo usuario
-            const newUser = {
-                id: exampleUsers.length + 1,
-                name: name,
-                email: email,
-                phone: phone,
-                password: password
-            };
-            
-            // En un sistema real, aquí enviaríamos los datos al servidor
-            // Por ahora, solo agregamos al array de ejemplo
+            if (!emailRegex.test(email)) { showError('registerEmailError', 'El correo electrónico no es válido'); return; }
+            if (exampleUsers.some(u => u.email === email)) { showError('registerEmailError', 'Este correo ya está registrado'); return; }
+            if (!password) { showError('registerPasswordError', 'La contraseña es requerida'); return; }
+            if (password.length < 6) { showError('registerPasswordError', 'La contraseña debe tener al menos 6 caracteres'); return; }
+            if (password !== confirmPassword) { showError('registerConfirmPasswordError', 'Las contraseñas no coinciden'); return; }
+            if (!validateCaptcha(captchaInput, registerCaptchaAnswer, 'registerCaptchaError')) return;
+
+            const newUser = { id: exampleUsers.length + 1, name: name, email: email, phone: phone, password: password };
             exampleUsers.push(newUser);
-            
-            // Mostrar mensaje de éxito
             const successElement = document.getElementById('registerSuccess');
             successElement.textContent = '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.';
             successElement.style.display = 'block';
-            
-            // Cambiar a pestaña de login después de 2 segundos
-            setTimeout(() => {
-                switchAuthTab('login');
-                document.getElementById('loginEmail').value = email;
-            }, 2000);
-            
-            // Limpiar formulario
+            setTimeout(() => { switchAuthTab('login'); document.getElementById('loginEmail').value = email; }, 2000);
             event.target.reset();
         }
 
@@ -1452,17 +1260,12 @@
             const userMenu = document.getElementById('userMenu');
             const loginBtnContainer = document.getElementById('loginBtnContainer');
             const userNameElement = document.getElementById('userName');
-            
             if (currentUser) {
-                // Mostrar menú de usuario
                 userMenu.style.display = 'block';
                 loginBtnContainer.style.display = 'none';
-                userNameElement.textContent = currentUser.name.split(' ')[0]; // Mostrar solo el primer nombre
-                
-                // Cerrar dropdown si está abierto
+                userNameElement.textContent = currentUser.name.split(' ')[0];
                 document.getElementById('userDropdown').style.display = 'none';
             } else {
-                // Mostrar botón de login
                 userMenu.style.display = 'none';
                 loginBtnContainer.style.display = 'block';
             }
@@ -1471,145 +1274,56 @@
         function checkAuthOnLoad() {
             const savedUser = localStorage.getItem('fruteriaUser');
             if (savedUser) {
-                try {
-                    currentUser = JSON.parse(savedUser);
-                    updateUserInterface();
-                } catch (e) {
-                    console.error('Error al cargar usuario:', e);
-                    localStorage.removeItem('fruteriaUser');
-                }
+                try { currentUser = JSON.parse(savedUser); updateUserInterface(); } catch(e) { localStorage.removeItem('fruteriaUser'); }
             }
         }
 
-        // ===== CARRUSEL CORREGIDO Y FUNCIONAL =====
+        // ===== CARRUSEL =====
         let currentSlideIndex = 0;
         let carouselInterval;
         let isHovering = false;
         let hoverTimeout;
         const slideIntervalTime = 5000;
-        const hoverDelay = 800; // Retardo para navegación por hover
-        
-        // Inicializar el carrusel
-        function initCarousel() {
-            updateCarouselPosition();
-            startCarouselInterval();
-        }
-        
-        // Actualizar la posición del carrusel
+        const hoverDelay = 800;
+
+        function initCarousel() { updateCarouselPosition(); startCarouselInterval(); }
         function updateCarouselPosition() {
             const carouselSlides = document.getElementById('carouselSlides');
             const indicators = document.querySelectorAll('.carousel-indicator');
-            
-            // Mover el carrusel
             carouselSlides.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
-            
-            // Actualizar indicadores
-            indicators.forEach((indicator, index) => {
-                if (index === currentSlideIndex) {
-                    indicator.classList.add('active');
-                } else {
-                    indicator.classList.remove('active');
-                }
-            });
+            indicators.forEach((indicator, index) => { if (index === currentSlideIndex) indicator.classList.add('active'); else indicator.classList.remove('active'); });
         }
-        
-        // Cambiar de slide
         function changeSlide(direction) {
             const slides = document.querySelectorAll('.carousel-slide');
             const totalSlides = slides.length;
-            
-            if (direction === 'next') {
-                currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
-            } else if (direction === 'prev') {
-                currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
-            }
-            
-            updateCarouselPosition();
-            resetCarouselInterval();
+            if (direction === 'next') currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+            else if (direction === 'prev') currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+            updateCarouselPosition(); resetCarouselInterval();
         }
-        
-        // Ir a un slide específico
-        function goToSlide(slideIndex) {
-            currentSlideIndex = slideIndex;
-            updateCarouselPosition();
-            resetCarouselInterval();
-        }
-        
-        // Navegación por hover
+        function goToSlide(slideIndex) { currentSlideIndex = slideIndex; updateCarouselPosition(); resetCarouselInterval(); }
         function handleHoverNavigation(direction) {
             if (isHovering) return;
-            
             isHovering = true;
-            
-            // Limpiar timeout anterior si existe
-            if (hoverTimeout) {
-                clearTimeout(hoverTimeout);
-            }
-            
-            // Cambiar de slide después del retardo
-            hoverTimeout = setTimeout(() => {
-                changeSlide(direction);
-                isHovering = false;
-            }, hoverDelay);
+            if (hoverTimeout) clearTimeout(hoverTimeout);
+            hoverTimeout = setTimeout(() => { changeSlide(direction); isHovering = false; }, hoverDelay);
         }
-        
-        // Cancelar hover al salir del área
-        function cancelHover() {
-            if (hoverTimeout) {
-                clearTimeout(hoverTimeout);
-                isHovering = false;
-            }
-        }
-        
-        // Iniciar intervalo automático
-        function startCarouselInterval() {
-            carouselInterval = setInterval(() => {
-                changeSlide('next');
-            }, slideIntervalTime);
-        }
-        
-        // Reiniciar intervalo
-        function resetCarouselInterval() {
-            clearInterval(carouselInterval);
-            startCarouselInterval();
-        }
-        
-        // Pausar carrusel
-        function pauseCarousel() {
-            clearInterval(carouselInterval);
-        }
-        
-        // Reanudar carrusel
-        function resumeCarousel() {
-            startCarouselInterval();
-        }
-        
+        function cancelHover() { if (hoverTimeout) { clearTimeout(hoverTimeout); isHovering = false; } }
+        function startCarouselInterval() { carouselInterval = setInterval(() => changeSlide('next'), slideIntervalTime); }
+        function resetCarouselInterval() { clearInterval(carouselInterval); startCarouselInterval(); }
+        function pauseCarousel() { clearInterval(carouselInterval); }
+        function resumeCarousel() { startCarouselInterval(); }
+
         // ===== FUNCIONES EXISTENTES =====
         let currentQuantity = 1;
-        let currentProduct = {
-            name: '',
-            price: 0,
-            description: '',
-            image: '',
-            category: ''
-        };
+        let currentProduct = { name: '', price: 0, description: '', image: '', category: '' };
 
-        // Función para actualizar el contador del carrito
         function actualizarContadorCarrito() {
             const carrito = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
             const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
             document.getElementById('cartCount').textContent = totalItems;
         }
-        
         function openModal(name, price, description, image, category) {
-            currentProduct = {
-                name: name,
-                price: price,
-                description: description,
-                image: image,
-                category: category
-            };
-            
+            currentProduct = { name, price, description, image, category };
             document.getElementById('modalProductName').textContent = name;
             document.getElementById('modalProductPrice').textContent = `$${price.toFixed(2)}`;
             document.getElementById('modalProductDescription').textContent = description;
@@ -1618,290 +1332,138 @@
             document.getElementById('quantityDisplay').textContent = currentQuantity;
             updatePriceDisplay();
         }
-        
-        function closeModal() {
-            document.getElementById('productModal').style.display = 'none';
-        }
-        
+        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         function increaseQuantity() {
-            if (currentProduct.category === 'Tornachiles') {
-                currentQuantity++;
-            } else {
-                currentQuantity += 0.5;
-            }
+            if (currentProduct.category === 'Tornachiles') currentQuantity++;
+            else currentQuantity += 0.5;
             document.getElementById('quantityDisplay').textContent = currentQuantity;
             updatePriceDisplay();
         }
-        
         function decreaseQuantity() {
-            if (currentProduct.category === 'Tornachiles') {
-                if (currentQuantity > 1) {
-                    currentQuantity--;
-                    document.getElementById('quantityDisplay').textContent = currentQuantity;
-                    updatePriceDisplay();
-                }
-            } else {
-                if (currentQuantity > 0.5) {
-                    currentQuantity -= 0.5;
-                    document.getElementById('quantityDisplay').textContent = currentQuantity;
-                    updatePriceDisplay();
-                }
-            }
+            if (currentProduct.category === 'Tornachiles') { if (currentQuantity > 1) { currentQuantity--; document.getElementById('quantityDisplay').textContent = currentQuantity; updatePriceDisplay(); } }
+            else { if (currentQuantity > 0.5) { currentQuantity -= 0.5; document.getElementById('quantityDisplay').textContent = currentQuantity; updatePriceDisplay(); } }
         }
-        
-        // Función para actualizar el precio mostrado según la cantidad
-        function updatePriceDisplay() {
-            const totalPrice = (currentProduct.price * currentQuantity).toFixed(2);
-            document.getElementById('modalProductPrice').textContent = `$${totalPrice}`;
-        }
-        
-        // Función para mostrar mensaje de confirmación
+        function updatePriceDisplay() { const totalPrice = (currentProduct.price * currentQuantity).toFixed(2); document.getElementById('modalProductPrice').textContent = `$${totalPrice}`; }
         function showConfirmationMessage(message) {
             const messageElement = document.getElementById('confirmationMessage');
             messageElement.textContent = message;
             messageElement.classList.add('show');
-            
-            // Ocultar el mensaje después de 3 segundos
-            setTimeout(() => {
-                messageElement.classList.remove('show');
-            }, 3000);
+            setTimeout(() => messageElement.classList.remove('show'), 3000);
         }
-        
         function addToCart() {
-            // Verificar si el usuario ha iniciado sesión
-            if (!currentUser) {
-                showConfirmationMessage('Debes iniciar sesión para agregar productos al carrito');
-                openAuthModal();
-                return;
-            }
-            
-            // Obtener carrito actual de localStorage
+            if (!currentUser) { showConfirmationMessage('Debes iniciar sesión para agregar productos al carrito'); openAuthModal(); return; }
             const carritoActual = JSON.parse(localStorage.getItem('carritoFruteria')) || [];
-            
-            // Buscar si el producto ya está en el carrito
-            const existingProductIndex = carritoActual.findIndex(item => 
-                item.producto === currentProduct.name && item.categoria === currentProduct.category
-            );
-            
-            if (existingProductIndex !== -1) {
-                // Si ya existe, aumentar la cantidad
-                carritoActual[existingProductIndex].cantidad += currentQuantity;
-            } else {
-                // Si no existe, agregar nuevo producto
-                carritoActual.push({
-                    producto: currentProduct.name,
-                    categoria: currentProduct.category,
-                    precio: currentProduct.price,
-                    cantidad: currentQuantity,
-                    imagen: currentProduct.image,
-                    descripcion: currentProduct.description
-                });
-            }
-            
-            // Guardar en localStorage
+            const existingProductIndex = carritoActual.findIndex(item => item.producto === currentProduct.name && item.categoria === currentProduct.category);
+            if (existingProductIndex !== -1) carritoActual[existingProductIndex].cantidad += currentQuantity;
+            else carritoActual.push({ producto: currentProduct.name, categoria: currentProduct.category, precio: currentProduct.price, cantidad: currentQuantity, imagen: currentProduct.image, descripcion: currentProduct.description });
             localStorage.setItem('carritoFruteria', JSON.stringify(carritoActual));
-            
-            // Actualizar contador del carrito
             actualizarContadorCarrito();
-            
-            // Mostrar mensaje de confirmación
             let unidad = currentProduct.category === 'Tornachiles' ? 'botellas' : 'KG';
             showConfirmationMessage(`Se agregaron ${currentQuantity} ${unidad} de ${currentProduct.name} a los pedidos`);
-            
             closeModal();
         }
-        
-        // Funciones para el modal de ayuda
-        function openHelpModal() {
-            document.getElementById('helpModal').style.display = 'flex';
-        }
-        
-        function closeHelpModal() {
-            document.getElementById('helpModal').style.display = 'none';
-        }
-        
-        // ===== FUNCIONES PARA EL BUSCADOR =====
+        function openHelpModal() { document.getElementById('helpModal').style.display = 'flex'; }
+        function closeHelpModal() { document.getElementById('helpModal').style.display = 'none'; }
+
+        // ===== BUSCADOR =====
         function searchProducts() {
             const searchInput = document.getElementById('searchInput');
             const searchResults = document.getElementById('searchResults');
             const query = searchInput.value.toLowerCase().trim();
-            
-            // Si no hay búsqueda, ocultar resultados
-            if (query.length === 0) {
-                searchResults.style.display = 'none';
-                return;
-            }
-            
-            // Array de productos disponibles
+            if (query.length === 0) { searchResults.style.display = 'none'; return; }
             const products = [
-                // Frutas
                 { name: "Manzanas Rojas", category: "Frutas", price: 40.00, image: "imagenes/Manzana.png", description: "Manzanas rojas dulces." },
                 { name: "Plátanos", category: "Frutas", price: 20.00, image: "imagenes/Platanos.png", description: "Plátanos maduros y dulces." },
                 { name: "Manzana Verde", category: "Frutas", price: 35.00, image: "imagenes/Manzana verde.png", description: "Manzana Verde para su fruta" },
                 { name: "Papaya", category: "Frutas", price: 37.00, image: "imagenes/Papaya.png", description: "Papaya fresca y sabrosa." },
-                
-                // Verduras
                 { name: "Tomate Rojo", category: "Verduras", price: 27.00, image: "imagenes/Tomates.png", description: "Tomates maduros y sabrosos." },
                 { name: "Cebollas", category: "Verduras", price: 24.00, image: "imagenes/Cebolla.png", description: "Cebollas ideales para guisos." },
                 { name: "Papas", category: "Verduras", price: 20.00, image: "imagenes/papa.png", description: "Papa Lavada." },
                 { name: "Chile Serranos", category: "Verduras", price: 55.00, image: "imagenes/Chile Serranos.png", description: "Chile Serranos." },
-                
-                // Carnes
                 { name: "Pollo", category: "Carne", price: 45.00, image: "imagenes/Pollo.png", description: "Pollo fresco." },
                 { name: "Carne Molida", category: "Carne", price: 200.00, image: "imagenes/Carne Molida.png", description: "Carne molida de res." },
                 { name: "Queso", category: "Carne", price: 160.00, image: "imagenes/Queso.png", description: "Queso para todas sus comidas." },
-                
-                // Tornachiles
                 { name: "Tornachiles", category: "Tornachiles", price: 35.00, image: "imagenes/Tornachiles.png", description: "Tornachiles en botella, ideales para acompañar con sus comidas" }
             ];
-            
-            // Filtrar productos
-            const filteredProducts = products.filter(product => 
-                product.name.toLowerCase().includes(query) || 
-                product.category.toLowerCase().includes(query) ||
-                product.description.toLowerCase().includes(query)
-            );
-            
-            // Mostrar resultados
+            const filteredProducts = products.filter(product => product.name.toLowerCase().includes(query) || product.category.toLowerCase().includes(query) || product.description.toLowerCase().includes(query));
             showSearchResults(filteredProducts, searchResults);
         }
-
         function showSearchResults(products, container) {
             container.innerHTML = '';
-            
-            if (products.length === 0) {
-                container.innerHTML = '<div class="no-results">No se encontraron productos</div>';
-                container.style.display = 'block';
-                return;
-            }
-            
+            if (products.length === 0) { container.innerHTML = '<div class="no-results">No se encontraron productos</div>'; container.style.display = 'block'; return; }
             products.forEach(product => {
                 const resultItem = document.createElement('div');
                 resultItem.className = 'search-result-item';
-                resultItem.onclick = () => {
-                    openModal(
-                        product.name, 
-                        product.price, 
-                        product.description, 
-                        product.image, 
-                        product.category
-                    );
-                    // Limpiar búsqueda
-                    document.getElementById('searchInput').value = '';
-                    container.style.display = 'none';
-                };
-                
-                resultItem.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}">
-                    <div class="search-result-info">
-                        <div class="search-result-name">${product.name}</div>
-                        <div class="search-result-category">${product.category}</div>
-                    </div>
-                    <div class="search-result-price">$${product.price.toFixed(2)}</div>
-                `;
-                
+                resultItem.onclick = () => { openModal(product.name, product.price, product.description, product.image, product.category); document.getElementById('searchInput').value = ''; container.style.display = 'none'; };
+                resultItem.innerHTML = `<img src="${product.image}" alt="${product.name}"><div class="search-result-info"><div class="search-result-name">${product.name}</div><div class="search-result-category">${product.category}</div></div><div class="search-result-price">$${product.price.toFixed(2)}</div>`;
                 container.appendChild(resultItem);
             });
-            
             container.style.display = 'block';
         }
 
-        // Cerrar modales al hacer clic fuera de ellos
+        // ===== MANEJO DEL SCROLL =====
+        function handleScroll() {
+            const header = document.querySelector('header');
+            const backToTopBtn = document.getElementById('backToTop');
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > 50) header.classList.add('header-scrolled');
+            else header.classList.remove('header-scrolled');
+            if (scrollTop > 300) backToTopBtn.classList.add('show');
+            else backToTopBtn.classList.remove('show');
+        }
+
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthOnLoad();
+            initCarousel();
+            const carouselContainer = document.getElementById('carouselContainer');
+            if (carouselContainer) {
+                carouselContainer.addEventListener('mouseenter', pauseCarousel);
+                carouselContainer.addEventListener('mouseleave', resumeCarousel);
+                const hoverAreas = carouselContainer.querySelectorAll('.carousel-hover-nav');
+                hoverAreas.forEach(area => area.addEventListener('mouseleave', cancelHover));
+            }
+            actualizarContadorCarrito();
+            setInterval(actualizarContadorCarrito, 2000);
+            setActiveNavigation();
+            window.addEventListener('scroll', handleScroll);
+            handleScroll();
+
+            // Generar CAPTCHA iniciales
+            refreshLoginCaptcha();
+            refreshRegisterCaptcha();
+        });
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'carritoFruteria') actualizarContadorCarrito();
+            if (e.key === 'fruteriaUser') checkAuthOnLoad();
+        });
+
+        function setActiveNavigation() {
+            const currentPage = window.location.pathname.split('/').pop() || 'Beta1.html';
+            document.querySelectorAll('nav ul li').forEach(item => item.classList.remove('active-nav-item'));
+            if (currentPage === 'Beta1.html' || currentPage === 'index.html' || currentPage === '') document.getElementById('nav-inicio').classList.add('active-nav-item');
+            else if (currentPage === 'frutas.html' || currentPage === 'verduras.html' || currentPage === 'carne.html' || currentPage === 'tornachiles.html') document.getElementById('nav-productos').classList.add('active-nav-item');
+            else if (currentPage === 'Contacto.html') document.getElementById('nav-contacto').classList.add('active-nav-item');
+            else if (currentPage === 'carrito.html') document.getElementById('nav-pedidos').classList.add('active-nav-item');
+        }
+
         window.onclick = function(event) {
             const modal = document.getElementById('productModal');
             const helpModal = document.getElementById('helpModal');
             const authOverlay = document.getElementById('authOverlay');
             const userDropdown = document.getElementById('userDropdown');
             const userMenu = document.getElementById('userMenu');
-            
-            if (event.target === modal) {
-                closeModal();
-            }
-            
-            if (event.target === helpModal) {
-                closeHelpModal();
-            }
-            
-            if (event.target === authOverlay) {
-                closeAuthModal();
-            }
-            
-            // Cerrar dropdown de usuario si se hace clic fuera
-            if (userDropdown && userMenu && !userMenu.contains(event.target)) {
-                userDropdown.style.display = 'none';
-            }
-        }
-
-        // Ocultar resultados del buscador al hacer clic fuera
+            if (event.target === modal) closeModal();
+            if (event.target === helpModal) closeHelpModal();
+            if (event.target === authOverlay) closeAuthModal();
+            if (userDropdown && userMenu && !userMenu.contains(event.target)) userDropdown.style.display = 'none';
+        };
         document.addEventListener('click', function(event) {
             const searchContainer = document.querySelector('.search-container');
             const searchResults = document.getElementById('searchResults');
-            
-            if (!searchContainer.contains(event.target)) {
-                searchResults.style.display = 'none';
-            }
+            if (!searchContainer.contains(event.target)) searchResults.style.display = 'none';
         });
-
-        // Inicializar cuando se carga la página
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verificar autenticación al cargar
-            checkAuthOnLoad();
-            
-            // Inicializar el carrusel
-            initCarousel();
-            
-            // Agregar eventos para pausar/reanudar el carrusel
-            const carouselContainer = document.getElementById('carouselContainer');
-            if (carouselContainer) {
-                carouselContainer.addEventListener('mouseenter', pauseCarousel);
-                carouselContainer.addEventListener('mouseleave', resumeCarousel);
-                
-                // Agregar eventos para cancelar hover al salir
-                const hoverAreas = carouselContainer.querySelectorAll('.carousel-hover-nav');
-                hoverAreas.forEach(area => {
-                    area.addEventListener('mouseleave', cancelHover);
-                });
-            }
-            
-            // Inicializar contador del carrito
-            actualizarContadorCarrito();
-            
-            // Actualizar contador periódicamente
-            setInterval(actualizarContadorCarrito, 2000);
-            
-            // Determinar qué página está activa
-            setActiveNavigation();
-        });
-
-        // Escuchar cambios en el storage
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'carritoFruteria') {
-                actualizarContadorCarrito();
-            }
-            if (e.key === 'fruteriaUser') {
-                checkAuthOnLoad();
-            }
-        });
-        
-        // Función para determinar qué página está activa
-        function setActiveNavigation() {
-            const currentPage = window.location.pathname.split('/').pop() || 'Beta1.html';
-            
-            document.querySelectorAll('nav ul li').forEach(item => {
-                item.classList.remove('active-nav-item');
-            });
-            
-            if (currentPage === 'Beta1.html' || currentPage === 'index.html' || currentPage === '') {
-                document.getElementById('nav-inicio').classList.add('active-nav-item');
-            } else if (currentPage === 'frutas.html' || currentPage === 'verduras.html' || 
-                       currentPage === 'carne.html' || currentPage === 'tornachiles.html') {
-                document.getElementById('nav-productos').classList.add('active-nav-item');
-            } else if (currentPage === 'Contacto.html') {
-                document.getElementById('nav-contacto').classList.add('active-nav-item');
-            } else if (currentPage === 'carrito.html') {
-                document.getElementById('nav-pedidos').classList.add('active-nav-item');
-            }
-        }
     </script>
 </body>
 </html>
