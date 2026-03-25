@@ -791,10 +791,41 @@
                         <input type="password" id="loginPassword" placeholder="Tu contraseña" required>
                         <div id="loginPasswordError" class="auth-error"></div>
                     </div>
+                  </div>
+                  <div style="text-align: right; margin-bottom: 15px;">
+                  <a href="#" onclick="showRecoverStep1()" style="color: #2e7d32; font-size: 14px; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                  </div>
                     <div id="loginError" class="auth-error"></div>
                     <button type="submit" class="auth-btn">Iniciar Sesión</button>
                 </form>
-                
+                 <form id="recoverStep1Form" class="auth-form" onsubmit="handleRecoverStep1(event)">
+                 <h2>Recuperar Cuenta</h2>
+                 <p style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">Ingresa tus datos registrados para verificar tu identidad.</p>
+                 <div class="form-group">
+                 <label>Correo de Respaldo</label>
+                  <input type="email" id="recoverEmail" placeholder="ejemplo@correo.com" required>
+                 </div>
+                 <div class="form-group">
+                 <label>Número de Teléfono</label>
+                 <input type="tel" id="recoverPhone" placeholder="10 dígitos" required>
+                </div>
+                <button type="submit" class="auth-btn">Verificar Datos</button>
+               <button type="button" onclick="switchAuthTab('login')" style="background:none; border:none; color:#666; width:100%; margin-top:10px; cursor:pointer;">Cancelar</button>
+            </form>
+
+             <form id="recoverStep2Form" class="auth-form" onsubmit="handleRecoverStep2(event)">
+             <h2>Nueva Contraseña</h2>
+             <div class="form-group">
+             <label>Nueva Contraseña</label>
+              <input type="password" id="newPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
+          </div>
+          <div class="form-group">
+          <label>Confirmar Nueva Contraseña</label>
+          <input type="password" id="confirmNewPassword" placeholder="Repite la contraseña" required>
+         </div>
+        <div id="recoverError" class="auth-error"></div>
+        <button type="submit" class="auth-btn">Actualizar Contraseña</button>
+        </form>
                 <!-- Formulario de Registro -->
                 <form id="registerForm" class="auth-form" onsubmit="register(event)">
                     <h2>Crear Cuenta</h2>
@@ -1226,6 +1257,72 @@
     </footer>
 
     <script>
+
+          // Función para mostrar el primer paso de recuperación
+function showRecoverStep1() {
+    // Ocultamos todos los formularios
+    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+    // Mostramos el de recuperación
+    document.getElementById('recoverStep1Form').classList.add('active');
+}
+
+// Manejar la verificación de datos (Paso 1)
+function handleRecoverStep1(event) {
+    event.preventDefault();
+    const email = document.getElementById('recoverEmail').value;
+    const phone = document.getElementById('recoverPhone').value;
+
+    // Aquí iría tu validación con Base de Datos o Firebase
+    if (email && phone.length >= 10) {
+        // Si los datos coinciden, pasamos al paso 2
+        document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+        document.getElementById('recoverStep2Form').classList.add('active');
+    } else {
+        alert("Por favor, ingresa datos válidos.");
+    }
+}
+
+// Manejar el cambio de contraseña (Paso 2)
+function handleRecoverStep2(event) {
+    event.preventDefault();
+    const newPass = document.getElementById('newPassword').value;
+    const confirmPass = document.getElementById('confirmNewPassword').value;
+    const errorDiv = document.getElementById('recoverError');
+
+    if (newPass !== confirmPass) {
+        errorDiv.textContent = "Las contraseñas no coinciden.";
+        errorDiv.style.display = "block";
+        return;
+    }
+
+    // Simulación de éxito
+    alert("¡Contraseña actualizada con éxito! Ahora puedes iniciar sesión.");
+    
+    // Limpiar y regresar al login
+    errorDiv.style.display = "none";
+    document.getElementById('recoverStep2Form').reset();
+    document.getElementById('recoverStep1Form').reset();
+    switchAuthTab('login');
+}
+
+// Asegúrate de que tu función switchAuthTab limpie los estados de recuperación
+function switchAuthTab(tab) {
+    const tabs = document.querySelectorAll('.auth-tab');
+    const forms = document.querySelectorAll('.auth-form');
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    forms.forEach(f => f.classList.remove('active'));
+    
+    if (tab === 'login') {
+        tabs[0].classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+    } else if (tab === 'register') {
+        tabs[1].classList.add('active');
+        document.getElementById('registerForm').classList.add('active');
+    }
+}
+
+
         // ===== SISTEMA DE AUTENTICACIÓN =====
         // Usuarios de ejemplo (en un sistema real, esto estaría en el servidor)
         const exampleUsers = [
@@ -1617,6 +1714,8 @@
             currentQuantity = 1;
             document.getElementById('quantityDisplay').textContent = currentQuantity;
             updatePriceDisplay();
+
+            []
         }
         
         function closeModal() {
